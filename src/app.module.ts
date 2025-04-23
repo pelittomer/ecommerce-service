@@ -19,9 +19,9 @@ import { CompanyModule } from './api/company-service/company/company.module';
 import { UploadModule } from './api/upload-service/upload/upload.module';
 import { ReturnRequestModule } from './api/payment-transactions-service/return-request/return-request.module';
 import { PaymentModule } from './api/payment-transactions-service/payment/payment.module';
-import { ShippingModule } from './api/payment-transactions-service/shipping/shipping.module';
 import { QuestionModule } from './api/interaction-reviews-service/question/question.module';
 import { ReviewModule } from './api/interaction-reviews-service/review/review.module';
+import { ShipperModule } from './api/payment-transactions-service/shipper/shipper.module';
 
 @Module({
   imports: [
@@ -59,9 +59,9 @@ import { ReviewModule } from './api/interaction-reviews-service/review/review.mo
     UploadModule,
     ReturnRequestModule,
     PaymentModule,
-    ShippingModule,
     QuestionModule,
     ReviewModule,
+    ShipperModule,
   ],
   controllers: [],
   providers: [],
