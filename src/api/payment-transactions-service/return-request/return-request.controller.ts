@@ -1,34 +1,29 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Put, UseGuards } from '@nestjs/common';
 import { ReturnRequestService } from './return-request.service';
-import { CreateReturnRequestDto } from './dto/create-return-request.dto';
-import { UpdateReturnRequestDto } from './dto/update-return-request.dto';
+import { AuthGuard } from 'src/common/guards/auth.guard';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { Role } from 'src/common/types';
 
 @Controller('return-request')
 export class ReturnRequestController {
-  constructor(private readonly returnRequestService: ReturnRequestService) {}
+  constructor(private readonly returnRequestService: ReturnRequestService) { }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.Customer)
   @Post()
-  create(@Body() createReturnRequestDto: CreateReturnRequestDto) {
-    return this.returnRequestService.create(createReturnRequestDto);
+  createReturnRequest() {
+    /*
+    This function initiates a new product return process.
+    */
   }
 
-  @Get()
-  findAll() {
-    return this.returnRequestService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.returnRequestService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateReturnRequestDto: UpdateReturnRequestDto) {
-    return this.returnRequestService.update(+id, updateReturnRequestDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.returnRequestService.remove(+id);
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.Seller)
+  @Put()
+  updateReturnRequest() {
+    /*
+    This function updates the status or details of an existing return request (for example, approving or rejecting the return).
+    */
   }
 }

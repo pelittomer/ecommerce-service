@@ -1,34 +1,41 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { QuestionService } from './question.service';
-import { CreateQuestionDto } from './dto/create-question.dto';
-import { UpdateQuestionDto } from './dto/update-question.dto';
+import { AuthGuard } from 'src/common/guards/auth.guard';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { Role } from 'src/common/types';
+import { ParseObjectIdPipe } from '@nestjs/mongoose';
+import { Types } from 'mongoose';
 
 @Controller('question')
 export class QuestionController {
-  constructor(private readonly questionService: QuestionService) {}
+  constructor(private readonly questionService: QuestionService) { }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.Customer)
   @Post()
-  create(@Body() createQuestionDto: CreateQuestionDto) {
-    return this.questionService.create(createQuestionDto);
+  createQuestion() {
+    /*
+    This function allows a user to create and submit a new question about a specific product.
+    */
+  }
+
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.Seller)
+  @Put(':id')
+  createAnswer(
+     @Param('id', ParseObjectIdPipe) questionId: Types.ObjectId
+  ) {
+    /*
+    This function allows an administrator or seller to create and submit an answer to a specific product question.
+    */
   }
 
   @Get()
-  findAll() {
-    return this.questionService.findAll();
+  fetchQuestion() {
+    /*
+    This function retrieves and lists all the questions and their corresponding answers associated with a specific product, identified by its product_id.
+    */
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.questionService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateQuestionDto: UpdateQuestionDto) {
-    return this.questionService.update(+id, updateQuestionDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.questionService.remove(+id);
-  }
 }

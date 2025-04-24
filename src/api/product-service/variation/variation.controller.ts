@@ -1,34 +1,28 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { VariationService } from './variation.service';
-import { CreateVariationDto } from './dto/create-variation.dto';
-import { UpdateVariationDto } from './dto/update-variation.dto';
+import { AuthGuard } from 'src/common/guards/auth.guard';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { Role } from 'src/common/types';
 
 @Controller('variation')
 export class VariationController {
-  constructor(private readonly variationService: VariationService) {}
+  constructor(private readonly variationService: VariationService) { }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.Admin)
   @Post()
-  create(@Body() createVariationDto: CreateVariationDto) {
-    return this.variationService.create(createVariationDto);
+  createVariation() {
+    /*
+    This function adds a new variation or filter option for products. For example, it could define a property like "color" with possible values such as "red," "yellow," and "white."
+    */
   }
 
   @Get()
-  findAll() {
-    return this.variationService.findAll();
+  fetchVariation() {
+    /*
+    This function retrieves and lists the available variation or filter options defined in the system.
+    */
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.variationService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateVariationDto: UpdateVariationDto) {
-    return this.variationService.update(+id, updateVariationDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.variationService.remove(+id);
-  }
 }

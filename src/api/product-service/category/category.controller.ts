@@ -1,34 +1,55 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { CategoryService } from './category.service';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { Role } from 'src/common/types';
+import { AuthGuard } from 'src/common/guards/auth.guard';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { ParseObjectIdPipe } from '@nestjs/mongoose';
+import { Types } from 'mongoose';
 
 @Controller('category')
 export class CategoryController {
-  constructor(private readonly categoryService: CategoryService) {}
+  constructor(private readonly categoryService: CategoryService) { }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.Admin)
   @Post()
-  create(@Body() createCategoryDto: CreateCategoryDto) {
-    return this.categoryService.create(createCategoryDto);
+  createCategory() {
+    /*
+    This function adds a new category to the system.
+    */
   }
 
-  @Get()
-  findAll() {
-    return this.categoryService.findAll();
+  @Get('leafs')
+  fetchLeafs() {
+    /*
+    This function retrieves and lists the leaf nodes of the category tree (categories that do not have any subcategories).
+    */
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.categoryService.findOne(+id);
+  @Get('roots')
+  fetchRoots() {
+    /*
+    This function retrieves and lists the root nodes of the category tree (top-level categories).
+    */
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
-    return this.categoryService.update(+id, updateCategoryDto);
+  @Get('tree')
+  fetchTree() {
+    /*
+      This function retrieves and displays the entire hierarchical structure of the categories.
+    */
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.categoryService.remove(+id);
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.Admin)
+  @Put(':id')
+  updateCategory(
+    @Param('id', ParseObjectIdPipe) categoryId: Types.ObjectId
+  ) {
+    /*
+     This function modifies the details of an existing category in the system.
+    */
   }
+
 }

@@ -1,34 +1,61 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { CompanyService } from './company.service';
-import { CreateCompanyDto } from './dto/create-company.dto';
-import { UpdateCompanyDto } from './dto/update-company.dto';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { Role } from 'src/common/types';
+import { AuthGuard } from 'src/common/guards/auth.guard';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { ParseObjectIdPipe } from '@nestjs/mongoose';
+import { Types } from 'mongoose';
 
 @Controller('company')
 export class CompanyController {
-  constructor(private readonly companyService: CompanyService) {}
+  constructor(private readonly companyService: CompanyService) { }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.Seller)
   @Post()
-  create(@Body() createCompanyDto: CreateCompanyDto) {
-    return this.companyService.create(createCompanyDto);
+  createCompany() {
+    /*
+    This function adds a new company to the system.
+    */
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.Seller)
+  @Put()
+  updateCompany() {
+    /*
+    This function updates the information of a specific company, identified by its ID.
+    */
+  }
+
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.Seller)
   @Get()
-  findAll() {
-    return this.companyService.findAll();
+  fetchCompany() {
+    /*
+    This function retrieves and returns the company associated with the authenticated user.
+    */
+  }
+
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.Admin)
+  @Put(':id')
+  updateCompanyStatus(
+    @Param('id', ParseObjectIdPipe) companyId: Types.ObjectId
+  ) {
+    /*
+    This function updates the status of a specific company (e.g., active, inactive).
+    */
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.companyService.findOne(+id);
+  fetchCompanyById(
+    @Param('id', ParseObjectIdPipe) companyId: Types.ObjectId
+  ) {
+    /*
+    This function retrieves and returns the detailed information for a specific company, identified by its ID.
+    */
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCompanyDto: UpdateCompanyDto) {
-    return this.companyService.update(+id, updateCompanyDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.companyService.remove(+id);
-  }
 }

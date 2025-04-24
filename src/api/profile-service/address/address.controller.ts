@@ -1,34 +1,54 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { AddressService } from './address.service';
-import { CreateAddressDto } from './dto/create-address.dto';
-import { UpdateAddressDto } from './dto/update-address.dto';
+import { AuthGuard } from 'src/common/guards/auth.guard';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { Role } from 'src/common/types';
+import { ParseObjectIdPipe } from '@nestjs/mongoose';
+import { Types } from 'mongoose';
 
 @Controller('address')
 export class AddressController {
-  constructor(private readonly addressService: AddressService) {}
+  constructor(private readonly addressService: AddressService) { }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.Customer)
   @Post()
-  create(@Body() createAddressDto: CreateAddressDto) {
-    return this.addressService.create(createAddressDto);
+  createAddress() {
+    /*
+    This function adds a new address for a user. It typically involves collecting address details such as street, city, and postal code and associating them with the user's account.
+     */
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.Customer)
   @Get()
-  findAll() {
-    return this.addressService.findAll();
+  fetchAddress() {
+    /*
+    This function retrieves and returns all the addresses associated with a specific user.
+    */
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.addressService.findOne(+id);
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.Customer)
+  @Put(':id')
+  updateAddress(
+    @Param('id', ParseObjectIdPipe) addressId: Types.ObjectId
+  ) {
+    /*
+    This function updates a specific address belonging to the user, identified by the provided ID, and sets it as the default address.
+    */
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAddressDto: UpdateAddressDto) {
-    return this.addressService.update(+id, updateAddressDto);
-  }
-
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.Customer)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.addressService.remove(+id);
+  removeAddress(
+    @Param('id', ParseObjectIdPipe) addressId: Types.ObjectId
+  ) {
+    /*
+    This function deletes a specific address belonging to the user, identified by the provided ID.
+    */
   }
+
 }

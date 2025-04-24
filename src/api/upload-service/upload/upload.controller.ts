@@ -1,34 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { UploadService } from './upload.service';
-import { CreateUploadDto } from './dto/create-upload.dto';
-import { UpdateUploadDto } from './dto/update-upload.dto';
+import { ParseObjectIdPipe } from '@nestjs/mongoose';
+import { Types } from 'mongoose';
 
 @Controller('upload')
 export class UploadController {
-  constructor(private readonly uploadService: UploadService) {}
-
-  @Post()
-  create(@Body() createUploadDto: CreateUploadDto) {
-    return this.uploadService.create(createUploadDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.uploadService.findAll();
-  }
+  constructor(private readonly uploadService: UploadService) { }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.uploadService.findOne(+id);
+  fetchImage(
+    @Param('id', ParseObjectIdPipe) imageId: Types.ObjectId
+  ) {
+    /*
+    This function retrieves and returns an image based on a provided image ID. It's used to fetch a specific image from the system's storage using its unique identifier.
+     */
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUploadDto: UpdateUploadDto) {
-    return this.uploadService.update(+id, updateUploadDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.uploadService.remove(+id);
-  }
 }

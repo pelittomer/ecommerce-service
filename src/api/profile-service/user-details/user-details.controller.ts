@@ -1,34 +1,30 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Put, UseGuards } from '@nestjs/common';
 import { UserDetailsService } from './user-details.service';
-import { CreateUserDetailDto } from './dto/create-user-detail.dto';
-import { UpdateUserDetailDto } from './dto/update-user-detail.dto';
+import { AuthGuard } from 'src/common/guards/auth.guard';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Role } from 'src/common/types';
+import { Roles } from 'src/common/decorators/roles.decorator';
 
 @Controller('user-details')
 export class UserDetailsController {
-  constructor(private readonly userDetailsService: UserDetailsService) {}
+  constructor(private readonly userDetailsService: UserDetailsService) { }
 
-  @Post()
-  create(@Body() createUserDetailDto: CreateUserDetailDto) {
-    return this.userDetailsService.create(createUserDetailDto);
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.Customer)
+  @Put()
+  updateDetails() {
+    /*
+    This function allows the user to update their personal information, such as name, email, or other relevant details associated with their profile.
+     */
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(Role.Customer)
   @Get()
-  findAll() {
-    return this.userDetailsService.findAll();
+  fetchDetails() {
+    /*
+    This function retrieves and displays the user's profile information.
+    */
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userDetailsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDetailDto: UpdateUserDetailDto) {
-    return this.userDetailsService.update(+id, updateUserDetailDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userDetailsService.remove(+id);
-  }
 }
