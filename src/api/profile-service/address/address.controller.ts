@@ -26,10 +26,8 @@ export class AddressController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Customer)
   @Get()
-  fetchAddress() {
-    /*
-    This function retrieves and returns all the addresses associated with a specific user.
-    */
+  fetchAddress(@Req() req: Request) {
+    return this.addressService.findAddresses(req)
   }
 
   @UseGuards(AuthGuard, RolesGuard)

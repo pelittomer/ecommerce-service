@@ -4,6 +4,7 @@ import { CreateAddressDto } from './dto/create-address.dto';
 import { Request } from 'express';
 import { SharedUtilsService } from 'src/common/utils/shared-utils.service';
 import { Types } from 'mongoose';
+import { Address } from './schemas/address.schema';
 
 @Injectable()
 export class AddressService {
@@ -20,4 +21,12 @@ export class AddressService {
 
         return 'Address successfully created.'
     }
+
+    async findAddresses(req: Request): Promise<Address[]> {
+        const user = this.sharedUtilsService.getUserInfo(req)
+        const userId = new Types.ObjectId(user.userId)
+
+        return await this.addressRepository.find(userId)
+    }
+    
 }

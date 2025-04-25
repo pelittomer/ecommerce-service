@@ -31,4 +31,9 @@ export class AddressRepository {
             )
         })
     }
+
+    async find(userId: Types.ObjectId): Promise<Address[]> {
+        return await this.addressModel.find({ user: userId }).lean()
+    }
+    
 }
