@@ -17,27 +17,26 @@ export class UserDetailsRepository {
         await this.userDetailsModel.create([userInputs], { session })
     }
 
-    async findOne(queryFieds: Partial<UserDetails>, session?: ClientSession): Promise<UserDetailsDocument | null> {
+    async findOne(queryFieds: Partial<UserDetails>): Promise<UserDetailsDocument | null> {
         return await this.userDetailsModel.findOne(queryFieds)
     }
+
     async findOneAndUpdate(
         queryFields: Partial<UserDetails>,
         userInputs: Partial<UserDetails>,
         uploadedImage?: Express.Multer.File
     ): Promise<void> {
-        await this.sharedUtilsService.executeTransaction(async (session) => {
-            const existingUserDetails = await this.findOne({ user: queryFields.user }, session)
-            if (!existingUserDetails) {
-                throw new NotFoundException('User details not found.')
-            }
+        const existingUserDetails = await this.findOne({ user: queryFields.user })
+        if (!existingUserDetails) {
+            throw new NotFoundException('User details not found.')
+        }
 
+        await this.sharedUtilsService.executeTransaction(async (session) => {
             if (uploadedImage) {
                 const newImage = existingUserDetails.avatar
                     ? await this.uploadService.updateExistingImage(uploadedImage, existingUserDetails.avatar, session)
                     : await this.uploadService.createImage(uploadedImage, session)
-                if (newImage) {
-                    userInputs.avatar = newImage._id as Types.ObjectId
-                }
+                if (newImage) userInputs.avatar = newImage._id as Types.ObjectId
             }
 
             await this.userDetailsModel.findOneAndUpdate(queryFields, userInputs, { session })
