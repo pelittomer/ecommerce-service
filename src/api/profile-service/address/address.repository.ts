@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { ClientSession, Model, Types } from "mongoose";
 import { Address } from "./schemas/address.schema";
@@ -46,6 +46,34 @@ export class AddressRepository {
                 { is_default: true },
                 { session }
             )
+        })
+    }
+
+    async delete(addressId: Types.ObjectId, userId: Types.ObjectId): Promise<void> {
+        await this.sharedUtilsService.executeTransaction(async (session) => {
+            const deletedAddress = await this.addressModel.findOneAndDelete(
+                { _id: addressId, user: userId },
+                { session },
+            )
+            if (!deletedAddress) {
+                throw new NotFoundException('Address not found or user unauthorized.')
+            }
+
+            if (deletedAddress.is_default) {
+                // Retrieve the user's addresses, sorted by creation date (newest first).
+                const addresses = await this.addressModel
+                    .find({ user: userId }, {}, { session })
+                    .sort({ createdAt: -1 })
+                    .limit(1)
+                // If there are addresses, set the newest one as the default.
+                if (addresses.length > 0) {
+                    await this.addressModel.updateOne(
+                        { _id: addresses[0]._id },
+                        { is_default: true },
+                        { session }
+                    )
+                }
+            }
         })
     }
 }

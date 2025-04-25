@@ -38,4 +38,13 @@ export class AddressService {
         return 'Address successfully updated.'
     }
 
+    async deleteAddress(req: Request, addressId: Types.ObjectId): Promise<string> {
+        const user = this.sharedUtilsService.getUserInfo(req)
+        const userId = new Types.ObjectId(user.userId)
+
+        await this.addressRepository.delete(addressId, userId)
+
+        return 'Address deleted and the last added address set as default.'
+    }
+
 }

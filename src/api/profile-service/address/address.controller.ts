@@ -44,11 +44,10 @@ export class AddressController {
   @Roles(Role.Customer)
   @Delete(':id')
   removeAddress(
+    @Req() req: Request,
     @Param('id', ParseObjectIdPipe) addressId: Types.ObjectId
   ) {
-    /*
-    This function deletes a specific address belonging to the user, identified by the provided ID.
-    */
+    return this.addressService.deleteAddress(req, addressId)
   }
 
 }
