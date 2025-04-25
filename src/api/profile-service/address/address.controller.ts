@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { AddressService } from './address.service';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
@@ -6,6 +6,8 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/types';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
+import { CreateAddressDto } from './dto/create-address.dto';
+import { Request } from 'express';
 
 @Controller('address')
 export class AddressController {
@@ -14,10 +16,11 @@ export class AddressController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Customer)
   @Post()
-  createAddress() {
-    /*
-    This function adds a new address for a user. It typically involves collecting address details such as street, city, and postal code and associating them with the user's account.
-     */
+  createAddress(
+    @Body() userInputs: CreateAddressDto,
+    @Req() req: Request
+  ) {
+    return this.addressService.createAddress(userInputs, req)
   }
 
   @UseGuards(AuthGuard, RolesGuard)
