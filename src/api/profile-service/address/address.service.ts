@@ -28,5 +28,14 @@ export class AddressService {
 
         return await this.addressRepository.find(userId)
     }
-    
+
+    async updateAddressDefault(req: Request, addressId: Types.ObjectId): Promise<string> {
+        const user = this.sharedUtilsService.getUserInfo(req)
+        const userId = new Types.ObjectId(user.userId)
+
+        await this.addressRepository.update(addressId, userId)
+
+        return 'Address successfully updated.'
+    }
+
 }

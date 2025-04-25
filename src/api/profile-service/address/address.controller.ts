@@ -34,11 +34,10 @@ export class AddressController {
   @Roles(Role.Customer)
   @Put(':id')
   updateAddress(
+    @Req() req: Request,
     @Param('id', ParseObjectIdPipe) addressId: Types.ObjectId
   ) {
-    /*
-    This function updates a specific address belonging to the user, identified by the provided ID, and sets it as the default address.
-    */
+    return this.addressService.updateAddressDefault(req, addressId)
   }
 
   @UseGuards(AuthGuard, RolesGuard)

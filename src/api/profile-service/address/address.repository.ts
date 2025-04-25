@@ -35,5 +35,17 @@ export class AddressRepository {
     async find(userId: Types.ObjectId): Promise<Address[]> {
         return await this.addressModel.find({ user: userId }).lean()
     }
-    
+
+    async update(addressId: Types.ObjectId, userId: Types.ObjectId): Promise<void> {
+        await this.sharedUtilsService.executeTransaction(async (session) => {
+            // Set all existing default addresses for the user to false.
+            await this.unsetExistingDefaultAddress(userId, session)
+            // Create the new address.
+            await this.addressModel.findOneAndUpdate(
+                { _id: addressId, user: userId },
+                { is_default: true },
+                { session }
+            )
+        })
+    }
 }
