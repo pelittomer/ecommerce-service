@@ -1,20 +1,26 @@
-import { Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RoleParam } from './lib/role-validation.pipe';
 import { UserRole } from './types';
+import { Role } from 'src/common/types';
+import { RegisterDto } from './dto/register.dto';
 
 @Controller('user/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
+  private mapRoleParamToEnum(roleParam: UserRole): Exclude<Role, Role.Admin> {
+    return roleParam === 'customer' ? Role.Customer : Role.Seller;
+  }
+
   @Post(':role/sign-up')
   signUp(
+    @Body() userInputs: RegisterDto,
     @RoleParam() roleParam: UserRole
   ) {
-    /*
-    This function creates a new user account in the system. It typically involves collecting user information such as username, email, and password, and storing it securely.
-    */
+    const role = this.mapRoleParamToEnum(roleParam)
+    return this.authService.register(userInputs, role)
   }
 
   @Post(':role/sign-in')

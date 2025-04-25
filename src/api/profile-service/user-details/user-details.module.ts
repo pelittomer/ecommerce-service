@@ -10,6 +10,7 @@ import { UserDetailsRepository } from './user-details.repository';
   providers: [UserDetailsService, UserDetailsRepository],
   imports: [
     MongooseModule.forFeature([{ name: UserDetails.name, schema: UserDetailsSchema }]),
-  ]
+  ],
+  exports: [UserDetailsRepository]
 })
 export class UserDetailsModule { }
