@@ -45,11 +45,11 @@ export class AuthController {
   }
 
   @Get('refresh')
-  refresh() {
-    /*
-    This function is used to obtain a new access token without requiring the user to log in again. This is often done using a refresh token, which has a longer lifespan than the access token.
-    */
-
+  refresh(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    return this.authService.refresh(req, res)
   }
 
 }

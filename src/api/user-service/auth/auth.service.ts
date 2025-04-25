@@ -1,4 +1,4 @@
-import { BadRequestException, HttpStatus, Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, HttpStatus, Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
 import { Role } from 'src/common/types';
 import { UserRepository } from '../user/user.repository';
@@ -120,6 +120,44 @@ export class AuthService {
         })
 
         return 'You have successfully logged out.'
+    }
+
+    async refresh(req: Request, res: Response) {
+        const cookies = req.cookies
+        // Check if refresh token cookie exists
+        if (!cookies.jwt) {
+            throw new UnauthorizedException('The information required to refresh your session was not found. Please log in again.')
+        }
+
+        const refreshToken = cookies.jwt
+
+        try {
+            // Verify refresh token
+            const decoded = await this.jwtService.verifyAsync(refreshToken, {
+                secret: this.configService.get('auth.secret_key', { infer: true }),
+            })
+            // Find user by decoded userId
+            const foundUser = await this.userRepository.findById(decoded.userId)
+            if (!foundUser) {
+                throw new UnauthorizedException('Your user account could not be verified. Please log in again.')
+            }
+            // Create new access token payload
+            const payload = {
+                username: foundUser.username,
+                userId: foundUser._id,
+                roles: foundUser.roles,
+            }
+            // Generate new access token
+            const accessToken = this.jwtService.sign(payload, { expiresIn: this.accessTokenExpiresIn })
+
+            return { accessToken }
+        } catch (error) {
+            if (error.name === 'TokenExpiredError') {
+                throw new ForbiddenException('Your session has expired. Please log in again.')
+            } else {
+                throw new ForbiddenException('Your session could not be verified. Please log in again.')
+            }
+        }
     }
 
 }
