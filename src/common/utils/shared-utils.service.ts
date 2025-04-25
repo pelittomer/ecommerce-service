@@ -1,6 +1,8 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { InjectConnection } from "@nestjs/mongoose";
 import { ClientSession, Connection } from "mongoose";
+import { UserInfo } from "../types";
+import { Request } from "express";
 
 
 @Injectable()
@@ -19,5 +21,13 @@ export class SharedUtilsService {
         } finally {
             session.endSession()
         }
+    }
+
+    getUserInfo(req: Request): UserInfo {
+        const user = req['UserInfo']
+        if (!user) {
+            throw new UnauthorizedException('You must be logged in.')
+        }
+        return user
     }
 }
