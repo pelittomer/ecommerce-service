@@ -21,16 +21,14 @@ export class UserDetailsController {
     @Req() req: Request,
     @UploadedFile() uploadedImage: Express.Multer.File
   ) {
-   return this.userDetailsService.updateUserDetails(userInputs,req,uploadedImage)
+    return this.userDetailsService.updateUserDetails(userInputs, req, uploadedImage)
   }
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Customer)
   @Get()
-  fetchDetails() {
-    /*
-    This function retrieves and displays the user's profile information.
-    */
+  fetchDetails(@Req() req: Request) {
+    return this.userDetailsService.findUserDetails(req)
   }
 
 }

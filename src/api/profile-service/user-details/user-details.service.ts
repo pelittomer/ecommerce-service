@@ -4,6 +4,7 @@ import { Request } from 'express';
 import { UserDetailsRepository } from './user-details.repository';
 import { SharedUtilsService } from 'src/common/utils/shared-utils.service';
 import { Types } from 'mongoose';
+import { UserDetailsDocument } from './schemas/user-detail.schema';
 
 @Injectable()
 export class UserDetailsService {
@@ -19,5 +20,12 @@ export class UserDetailsService {
         await this.userDetailsRepository.findOneAndUpdate({ user: userId }, userInputs, uploadedImage)
 
         return 'Your profile has been successfully updated.'
+    }
+
+    async findUserDetails(req: Request): Promise<UserDetailsDocument | null> {
+        const user = this.sharedUtilsService.getUserInfo(req)
+        const userId = new Types.ObjectId(user.userId)
+
+        return this.userDetailsRepository.findOne({ user: userId })
     }
 }
