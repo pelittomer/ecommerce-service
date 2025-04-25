@@ -1,16 +1,42 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
 import { Role } from 'src/common/types';
 import { UserRepository } from '../user/user.repository';
-import { genSalt, hash } from 'bcrypt';
+import { compare, genSalt, hash } from 'bcrypt';
+import { LoginDto } from './dto/login.dto';
+import { CookieOptions, Response } from 'express';
+import { Types } from 'mongoose';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { AppConfig } from 'src/config/type';
 
 @Injectable()
 export class AuthService {
     constructor(
-        private readonly userRepository: UserRepository
+        private readonly userRepository: UserRepository,
+        private readonly jwtService: JwtService,
+        private readonly configService: ConfigService<AppConfig>
     ) { }
 
     private readonly logger = new Logger(AuthService.name)
+    private readonly accessTokenExpiresIn = '15m'
+    private readonly refreshTokenExpiresIn = '7d'
+    private readonly jwtCookieOptions: CookieOptions = {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+    }
+
+    private handleAuthError(error) {
+        if (error instanceof BadRequestException || error instanceof NotFoundException || error instanceof UnauthorizedException) {
+            this.logger.warn(error.message, error.stack);
+            throw error;
+        } else {
+            this.logger.error(error.message, error.stack);
+            throw new Error('Something went wrong. Please try again.');
+        }
+    }
 
     async register(userInputs: RegisterDto, role: Exclude<Role, Role.Admin>): Promise<string> {
         const { username, email, password } = userInputs
@@ -36,6 +62,48 @@ export class AuthService {
         this.logger.log(`User registration completed successfully: username=${username}, userId=${user._id}, role=${role}`)
 
         return 'Your registration is complete. You can now log in.'
+    }
+
+    async login(userInputs: LoginDto, role: Role, res: Response) {
+        const { email, password } = userInputs
+
+        try {
+            const foundUser = await this.userRepository.findOne({ email })
+            // Check if user exists
+            if (!foundUser) {
+                throw new NotFoundException('A user with the entered email address was not found. Please check your email address or register.')
+            }
+
+            if (foundUser.roles !== role && foundUser.roles !== Role.Admin) {
+                throw new BadRequestException('You are not authorized to perform this operation.')
+            }
+
+            // Compare provided password with hashed password
+            const matchPassword = await compare(password, foundUser.password)
+            // Check if passwords match
+            if (!matchPassword) {
+                throw new UnauthorizedException('The password you entered is incorrect. Please check your password and try again.')
+            }
+
+            // Create payload for JWT
+            const payload = {
+                username: foundUser.username,
+                userId: foundUser._id as Types.ObjectId,
+                roles: foundUser.roles,
+            }
+
+            // Generate token
+            const accessToken = this.jwtService.sign(payload, { expiresIn: this.accessTokenExpiresIn })
+            const refreshToken = this.jwtService.sign(payload, { expiresIn: this.refreshTokenExpiresIn })
+
+            // Set cookie here
+            res.cookie('jwt', refreshToken, this.jwtCookieOptions)
+
+            return { accessToken }
+        } catch (error) {
+            this.handleAuthError(error)
+        }
+
     }
 
 }

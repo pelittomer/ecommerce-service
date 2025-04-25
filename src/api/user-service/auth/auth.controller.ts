@@ -1,10 +1,12 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RoleParam } from './lib/role-validation.pipe';
 import { UserRole } from './types';
 import { Role } from 'src/common/types';
 import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
+import { Response } from 'express';
 
 @Controller('user/auth')
 export class AuthController {
@@ -25,12 +27,12 @@ export class AuthController {
 
   @Post(':role/sign-in')
   signIn(
-    @RoleParam() roleParam: UserRole
+    @Body() userInputs: LoginDto,
+    @RoleParam() roleParam: UserRole,
+    @Res({ passthrough: true }) res: Response
   ) {
-    /*
-    This function allows existing users to access their accounts by verifying their credentials (usually email and password). Upon successful verification, it establishes a session or issues an access token.
-    */
-
+    const role = this.mapRoleParamToEnum(roleParam)
+    return this.authService.login(userInputs, role, res)
   }
 
   @UseGuards(AuthGuard)

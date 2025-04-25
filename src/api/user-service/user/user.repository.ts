@@ -38,4 +38,9 @@ export class UserRepository {
         }
         return createdUser as UserDocument
     }
+
+
+    async findOne(query: Partial<User>): Promise<UserDocument | null> {
+        return await this.userModel.findOne(query)
+    }
 }
