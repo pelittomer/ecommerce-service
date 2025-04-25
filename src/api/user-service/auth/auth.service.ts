@@ -1,10 +1,10 @@
-import { BadRequestException, Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
 import { Role } from 'src/common/types';
 import { UserRepository } from '../user/user.repository';
 import { compare, genSalt, hash } from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
-import { CookieOptions, Response } from 'express';
+import { CookieOptions, Request, Response } from 'express';
 import { Types } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -103,7 +103,23 @@ export class AuthService {
         } catch (error) {
             this.handleAuthError(error)
         }
+    }
 
+    logout(req: Request, res: Response) {
+        const cookies = req.cookies
+        // Check if JWT cookie exists
+        if (!cookies.jwt) {
+            res.sendStatus(HttpStatus.OK)
+            return
+        }
+        // Clear the JWT cookie
+        res.clearCookie('jwt', {
+            httpOnly: true,
+            sameSite: 'none',
+            secure: true
+        })
+
+        return 'You have successfully logged out.'
     }
 
 }
