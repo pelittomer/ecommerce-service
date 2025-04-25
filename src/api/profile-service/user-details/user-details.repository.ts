@@ -1,15 +1,46 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { UserDetails } from "./schemas/user-detail.schema";
-import { ClientSession, Model } from "mongoose";
+import { UserDetails, UserDetailsDocument } from "./schemas/user-detail.schema";
+import { ClientSession, Model, Types } from "mongoose";
+import { UploadService } from "src/api/upload-service/upload/upload.service";
+import { SharedUtilsService } from "src/common/utils/shared-utils.service";
 
 @Injectable()
 export class UserDetailsRepository {
     constructor(
-        @InjectModel(UserDetails.name) private userDetailsModel: Model<UserDetails>
+        @InjectModel(UserDetails.name) private userDetailsModel: Model<UserDetails>,
+        private readonly sharedUtilsService: SharedUtilsService,
+        private readonly uploadService: UploadService,
     ) { }
 
     async create(userInputs: Pick<UserDetails, "user">, session?: ClientSession): Promise<void> {
         await this.userDetailsModel.create([userInputs], { session })
+    }
+
+    async findOne(queryFieds: Partial<UserDetails>, session?: ClientSession): Promise<UserDetailsDocument | null> {
+        return await this.userDetailsModel.findOne(queryFieds)
+    }
+    async findOneAndUpdate(
+        queryFields: Partial<UserDetails>,
+        userInputs: Partial<UserDetails>,
+        uploadedImage?: Express.Multer.File
+    ): Promise<void> {
+        await this.sharedUtilsService.executeTransaction(async (session) => {
+            const existingUserDetails = await this.findOne({ user: queryFields.user }, session)
+            if (!existingUserDetails) {
+                throw new NotFoundException('User details not found.')
+            }
+
+            if (uploadedImage) {
+                const newImage = existingUserDetails.avatar
+                    ? await this.uploadService.updateExistingImage(uploadedImage, existingUserDetails.avatar, session)
+                    : await this.uploadService.createImage(uploadedImage, session)
+                if (newImage) {
+                    userInputs.avatar = newImage._id as Types.ObjectId
+                }
+            }
+
+            await this.userDetailsModel.findOneAndUpdate(queryFields, userInputs, { session })
+        })
     }
 }
