@@ -5,6 +5,7 @@ import { Model, Types } from "mongoose";
 import { UploadService } from "src/api/upload-service/upload/upload.service";
 import { SharedUtilsService } from "src/common/utils/shared-utils.service";
 import { CreateCompanyDto } from "./dto/create-company.dto";
+import { UpdateCompanyStatusDto } from "./dto/update-company-status.dto";
 
 @Injectable()
 export class CompanyRepository {
@@ -51,5 +52,13 @@ export class CompanyRepository {
                 { session }
             )
         })
+    }
+
+    async findById(companyId: Types.ObjectId): Promise<Company | null> {
+        return await this.companyModel.findById(companyId).lean()
+    }
+
+    async findCompanyByIdAndUpdateStatus(companyId: Types.ObjectId, userInputs: UpdateCompanyStatusDto): Promise<void> {
+        await this.companyModel.findByIdAndUpdate(companyId, userInputs)
     }
 }

@@ -6,6 +6,7 @@ import { SharedUtilsService } from 'src/common/utils/shared-utils.service';
 import { Types } from 'mongoose';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { CompanyDocument } from './schemas/company.schema';
+import { UpdateCompanyStatusDto } from './dto/update-company-status.dto';
 
 @Injectable()
 export class CompanyService {
@@ -64,5 +65,15 @@ export class CompanyService {
     async getAuthenticatedCompany(req: Request): Promise<CompanyDocument | null> {
         const user = this.sharedUtilsService.getUserInfo(req)
         return await this.companyRepository.findOne({ user: new Types.ObjectId(user.userId) })
+    }
+
+    async updateCompanyStatus(userInputs: UpdateCompanyStatusDto, companyId: Types.ObjectId): Promise<string> {
+        const companyExists = await this.companyRepository.findById(companyId)
+        if (!companyExists) {
+            throw new NotFoundException('Company not found.')
+        }
+
+        await this.companyRepository.findCompanyByIdAndUpdateStatus(companyId, userInputs)
+        return 'Company status updated.'
     }
 }

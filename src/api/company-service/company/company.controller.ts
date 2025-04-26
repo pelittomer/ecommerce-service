@@ -10,6 +10,7 @@ import { UploadImage } from 'src/common/decorators/upload-image.decorator';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { Request } from 'express';
 import { UpdateCompanyDto } from './dto/update-company.dto';
+import { UpdateCompanyStatusDto } from './dto/update-company-status.dto';
 
 @Controller('company')
 export class CompanyController {
@@ -50,11 +51,10 @@ export class CompanyController {
   @Roles(Role.Admin)
   @Put(':id')
   updateCompanyStatus(
+    @Body() userInputs: UpdateCompanyStatusDto,
     @Param('id', ParseObjectIdPipe) companyId: Types.ObjectId
   ) {
-    /*
-    This function updates the status of a specific company (e.g., active, inactive).
-    */
+    return this.companyService.updateCompanyStatus(userInputs, companyId)
   }
 
   @Get(':id')
