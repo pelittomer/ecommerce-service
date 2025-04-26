@@ -58,12 +58,8 @@ export class CompanyController {
   }
 
   @Get(':id')
-  fetchCompanyById(
-    @Param('id', ParseObjectIdPipe) companyId: Types.ObjectId
-  ) {
-    /*
-    This function retrieves and returns the detailed information for a specific company, identified by its ID.
-    */
+  fetchCompanyById(@Param('id', ParseObjectIdPipe) companyId: Types.ObjectId) {
+    return this.companyService.findCompany(companyId)
   }
 
 }

@@ -61,4 +61,8 @@ export class CompanyRepository {
     async findCompanyByIdAndUpdateStatus(companyId: Types.ObjectId, userInputs: UpdateCompanyStatusDto): Promise<void> {
         await this.companyModel.findByIdAndUpdate(companyId, userInputs)
     }
+
+    async findCompanyByIdForCustomer(companyId: Types.ObjectId): Promise<Exclude<Company, 'tax_id' | 'tax_office' | 'rejection_reason'> | null> {
+        return await this.companyModel.findById(companyId).select('-tax_id -tax_office -rejection_reason').lean()
+    }
 }

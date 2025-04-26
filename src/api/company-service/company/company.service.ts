@@ -5,7 +5,7 @@ import { Request } from 'express';
 import { SharedUtilsService } from 'src/common/utils/shared-utils.service';
 import { Types } from 'mongoose';
 import { UpdateCompanyDto } from './dto/update-company.dto';
-import { CompanyDocument } from './schemas/company.schema';
+import { Company, CompanyDocument } from './schemas/company.schema';
 import { UpdateCompanyStatusDto } from './dto/update-company-status.dto';
 
 @Injectable()
@@ -75,5 +75,9 @@ export class CompanyService {
 
         await this.companyRepository.findCompanyByIdAndUpdateStatus(companyId, userInputs)
         return 'Company status updated.'
+    }
+
+    async findCompany(companyId: Types.ObjectId): Promise<Exclude<Company, 'tax_id' | 'tax_office' | 'rejection_reason'> | null> {
+        return this.companyRepository.findCompanyByIdForCustomer(companyId)
     }
 }
