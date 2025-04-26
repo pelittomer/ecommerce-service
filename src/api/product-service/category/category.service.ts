@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { CategoryRepository } from './category.repository';
 import { Category } from './schemas/category.schema';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class CategoryService {
@@ -25,5 +26,12 @@ export class CategoryService {
 
     async findRoots(): Promise<Category[]> {
         return await this.categoryRepository.findRoots()
+    }
+
+    async findTree(categoryId?: Types.ObjectId) {
+        if (!categoryId) {
+            return await this.categoryRepository.findRoots()
+        }
+        return await this.categoryRepository.findTree(categoryId)
     }
 }

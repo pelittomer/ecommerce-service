@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, UploadedFiles, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, UploadedFiles, UseGuards, ValidationPipe } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/types';
@@ -8,6 +8,7 @@ import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
 import { UploadCategoryImage } from './decorators/uploadCategoryImage';
 import { CreateCategoryDto } from './dto/create-category.dto';
+import { GetCategoryDto } from './dto/get-category.dto';
 
 @Controller('category')
 export class CategoryController {
@@ -35,10 +36,8 @@ export class CategoryController {
   }
 
   @Get('tree')
-  fetchTree() {
-    /*
-      This function retrieves and displays the entire hierarchical structure of the categories.
-    */
+  fetchTree(@Query(ValidationPipe) query: GetCategoryDto) {
+    return this.categoryService.findTree(query.categoryId)
   }
 
   @UseGuards(AuthGuard, RolesGuard)

@@ -5,12 +5,14 @@ import { ClientSession, Model, Types } from "mongoose";
 import { CreateCategoryDto } from "./dto/create-category.dto";
 import { SharedUtilsService } from "src/common/utils/shared-utils.service";
 import { UploadService } from "src/api/upload-service/upload/upload.service";
+import { CategoryUtilsService } from "./utils/category-utils.service";
 
 Injectable()
 export class CategoryRepository {
     constructor(
         @InjectModel(Category.name) private categoryModel: Model<Category>,
         private readonly sharedUtilsService: SharedUtilsService,
+        private readonly categoryUtilsService: CategoryUtilsService,
         private readonly uploadService: UploadService,
     ) { }
 
@@ -76,5 +78,24 @@ export class CategoryRepository {
         return await this.categoryModel.find({ parent: null })
             .sort({ view_count: -1 })
             .lean()
+    }
+
+    async findTree(categoryId: Types.ObjectId) {
+        const category = await this.categoryModel.findById(categoryId)
+        if (!category) return []
+
+        const rootCategory = await this.categoryModel.findOne({
+            left: { $lte: category.left },
+            right: { $gte: category.right },
+            parent: null,
+        }).sort({ right: 1 })
+        if (!rootCategory) return []
+
+        const categories = await this.categoryModel.find({
+            right: { $lte: rootCategory.right },
+            left: { $gte: rootCategory.left },
+        }).sort({ view_count: - 1 })
+
+        return this.categoryUtilsService.buildCategoryTree(categoryId, categories)
     }
 }
