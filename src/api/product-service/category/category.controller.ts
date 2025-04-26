@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, UploadedFiles, UseGuards } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/types';
@@ -6,6 +6,8 @@ import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
+import { UploadCategoryImage } from './decorators/uploadCategoryImage';
+import { CreateCategoryDto } from './dto/create-category.dto';
 
 @Controller('category')
 export class CategoryController {
@@ -14,10 +16,12 @@ export class CategoryController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Admin)
   @Post()
-  createCategory() {
-    /*
-    This function adds a new category to the system.
-    */
+  @UploadCategoryImage()
+  createCategory(
+    @Body() userInputs: CreateCategoryDto,
+    @UploadedFiles() files: { image: Express.Multer.File[], icon: Express.Multer.File[] }
+  ) {
+    return this.categoryService.createCategory(userInputs, files)
   }
 
   @Get('leafs')
