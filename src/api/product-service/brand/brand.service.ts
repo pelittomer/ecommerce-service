@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { BrandRepository } from './brand.repository';
 import { CreateBrandDto } from './dto/create-brand.dto';
+import { Brand } from './schemas/brand.schema';
 
 @Injectable()
 export class BrandService {
@@ -23,5 +24,8 @@ export class BrandService {
         return 'Brand successfully created.'
     }
 
+    async findBrands(): Promise<Brand[]> {
+        return await this.brandRepository.find()
+    }
 
 }

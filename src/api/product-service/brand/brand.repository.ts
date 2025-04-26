@@ -27,4 +27,8 @@ export class BrandRepository {
             })
         })
     }
+
+    async find(): Promise<Brand[]> {
+        return await this.brandModel.find()
+    }
 }

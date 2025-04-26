@@ -24,9 +24,6 @@ export class BrandController {
 
   @Get()
   fetchBrands() {
-    /*
-    This function retrieves and lists the available brands.
-    */
+    return this.brandService.findBrands()
   }
-
 }
