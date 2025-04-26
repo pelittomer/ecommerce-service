@@ -10,6 +10,10 @@ export class UploadRepository {
         @InjectModel(Upload.name) private uploadModel: Model<Upload>,
     ) { }
 
+    async findById(imageId: Types.ObjectId): Promise<Upload | null> {
+        return await this.uploadModel.findById(imageId).lean()
+    }
+
     async create(uploadData: CreateUploadDto, session: ClientSession): Promise<UploadDocument> {
         const [newImage] = await this.uploadModel.create([uploadData], { session })
         return newImage
