@@ -26,9 +26,7 @@ export class CategoryController {
 
   @Get('leafs')
   fetchLeafs() {
-    /*
-    This function retrieves and lists the leaf nodes of the category tree (categories that do not have any subcategories).
-    */
+    return this.categoryService.findLeafs()
   }
 
   @Get('roots')

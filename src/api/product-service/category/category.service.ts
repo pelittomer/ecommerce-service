@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { CategoryRepository } from './category.repository';
+import { Category } from './schemas/category.schema';
 
 @Injectable()
 export class CategoryService {
@@ -16,5 +17,9 @@ export class CategoryService {
         await this.categoryRepository.create(userInputs, uploadedImage)
 
         return 'Category successfully created.'
+    }
+
+    async findLeafs(): Promise<Category[]> {
+        return await this.categoryRepository.findLeafs()
     }
 }

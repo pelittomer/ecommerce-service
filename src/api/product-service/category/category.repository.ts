@@ -64,4 +64,11 @@ export class CategoryRepository {
                 : await this.createRootCategory(categoryData, session)
         })
     }
+
+    async findLeafs(): Promise<Category[]> {
+        return this.categoryModel.find({ $expr: { $eq: ['$right', { $add: ['$left', 1] }] } })
+            .sort({ view_count: -1 })
+            .limit(30)
+            .lean()
+    }
 }
