@@ -1,9 +1,10 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CompanyRepository } from './company.repository';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { Request } from 'express';
 import { SharedUtilsService } from 'src/common/utils/shared-utils.service';
 import { Types } from 'mongoose';
+import { UpdateCompanyDto } from './dto/update-company.dto';
 
 @Injectable()
 export class CompanyService {
@@ -39,5 +40,23 @@ export class CompanyService {
         await this.companyRepository.create(userId, userInputs, uploadedImage)
 
         return 'Your company has been successfully created.'
+    }
+
+    async updateCompany(userInputs: UpdateCompanyDto, req: Request, uploadedImage: Express.Multer.File) {
+        const user = this.sharedUtilsService.getUserInfo(req)
+        const userId = new Types.ObjectId(user.userId)
+
+        const companyExists = await this.companyRepository.findOne({ user: userId })
+        if (!companyExists) {
+            throw new NotFoundException('You have not created a company yet.')
+        }
+
+        await this.companyRepository.findByIdAndUpdate(
+            companyExists,
+            userInputs,
+            uploadedImage
+        )
+
+        return 'Your company information has been successfully updated.'
     }
 }

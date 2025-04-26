@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Company } from "./schemas/company.schema";
+import { Company, CompanyDocument } from "./schemas/company.schema";
 import { Model, Types } from "mongoose";
 import { UploadService } from "src/api/upload-service/upload/upload.service";
 import { SharedUtilsService } from "src/common/utils/shared-utils.service";
@@ -33,6 +33,23 @@ export class CompanyRepository {
                     logo: savedImage._id as Types.ObjectId
                 }
             ], { session })
+        })
+    }
+
+    async findOne(queryFieds: Partial<Company>): Promise<CompanyDocument | null> {
+        return await this.companyModel.findOne(queryFieds)
+    }
+
+    async findByIdAndUpdate(company: CompanyDocument, userInputs: Partial<Company>, uploadedImage: Express.Multer.File): Promise<void> {
+        await this.sharedUtilsService.executeTransaction(async (session) => {
+            if (uploadedImage && company && company.logo) {
+                await this.uploadService.updateExistingImage(uploadedImage, company.logo, session)
+            }
+            await this.companyModel.findByIdAndUpdate(
+                company._id,
+                userInputs,
+                { session }
+            )
         })
     }
 }

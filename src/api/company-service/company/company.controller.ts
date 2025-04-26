@@ -9,6 +9,7 @@ import { Types } from 'mongoose';
 import { UploadImage } from 'src/common/decorators/upload-image.decorator';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { Request } from 'express';
+import { UpdateCompanyDto } from './dto/update-company.dto';
 
 @Controller('company')
 export class CompanyController {
@@ -29,10 +30,13 @@ export class CompanyController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Seller)
   @Put()
-  updateCompany() {
-    /*
-    This function updates the information of a specific company, identified by its ID.
-    */
+  @UploadImage()
+  updateCompany(
+    @Body() userInputs: UpdateCompanyDto,
+    @Req() req: Request,
+    @UploadedFile() uploadedImage: Express.Multer.File
+  ) {
+    return this.companyService.updateCompany(userInputs, req, uploadedImage)
   }
 
   @UseGuards(AuthGuard, RolesGuard)
