@@ -26,9 +26,7 @@ export class ShipperController {
   @Roles(Role.Seller)
   @Get()
   fetchShipper() {
-    /*
-    This function retrieves and lists the available shipping companies.
-    */
+    return this.shipperService.findShippers()
   }
 
 }

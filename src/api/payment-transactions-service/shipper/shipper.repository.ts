@@ -27,4 +27,7 @@ export class ShipperRepository {
         })
     }
 
+    async find(): Promise<Exclude<Shipper, 'api_key'>[]> {
+        return await this.shipperModel.find().select('-api_key').lean()
+    }
 }

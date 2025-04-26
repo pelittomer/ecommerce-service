@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateShipperDto } from './dto/create-shipper.dto';
 import { ShipperRepository } from './shipper.repository';
 import { randomBytes } from 'crypto';
+import { Shipper } from './schemas/shipper.schema';
 
 @Injectable()
 export class ShipperService {
@@ -23,5 +24,9 @@ export class ShipperService {
         await this.shipperRepository.create({ ...userInputs, api_key }, uploadedImage)
 
         return 'Your company has been successfully created.'
+    }
+
+    async findShippers(): Promise<Exclude<Shipper, 'api_key'>[]> {
+        return await this.shipperRepository.find()
     }
 }
