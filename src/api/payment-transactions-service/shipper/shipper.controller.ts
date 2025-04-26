@@ -1,9 +1,11 @@
-import { Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UploadedFile, UseGuards } from '@nestjs/common';
 import { ShipperService } from './shipper.service';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/types';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
+import { UploadImage } from 'src/common/decorators/upload-image.decorator';
+import { CreateShipperDto } from './dto/create-shipper.dto';
 
 @Controller('shipper')
 export class ShipperController {
@@ -12,10 +14,12 @@ export class ShipperController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Admin)
   @Post()
-  createShipper() {
-    /*
-    This function adds a new shipping company to the system.
-    */
+  @UploadImage()
+  createShipper(
+    @Body() userInputs: CreateShipperDto,
+    @UploadedFile() uploadedImage: Express.Multer.File
+  ) {
+    return this.shipperService.createShipper(userInputs, uploadedImage)
   }
 
   @UseGuards(AuthGuard, RolesGuard)
