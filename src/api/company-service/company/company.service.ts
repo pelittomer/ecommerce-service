@@ -5,6 +5,7 @@ import { Request } from 'express';
 import { SharedUtilsService } from 'src/common/utils/shared-utils.service';
 import { Types } from 'mongoose';
 import { UpdateCompanyDto } from './dto/update-company.dto';
+import { CompanyDocument } from './schemas/company.schema';
 
 @Injectable()
 export class CompanyService {
@@ -58,5 +59,10 @@ export class CompanyService {
         )
 
         return 'Your company information has been successfully updated.'
+    }
+
+    async getAuthenticatedCompany(req: Request): Promise<CompanyDocument | null> {
+        const user = this.sharedUtilsService.getUserInfo(req)
+        return await this.companyRepository.findOne({ user: new Types.ObjectId(user.userId) })
     }
 }

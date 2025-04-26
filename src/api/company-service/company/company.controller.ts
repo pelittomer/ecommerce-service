@@ -42,10 +42,8 @@ export class CompanyController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Seller)
   @Get()
-  fetchCompany() {
-    /*
-    This function retrieves and returns the company associated with the authenticated user.
-    */
+  fetchCompany(@Req() req: Request) {
+    return this.companyService.getAuthenticatedCompany(req)
   }
 
   @UseGuards(AuthGuard, RolesGuard)
