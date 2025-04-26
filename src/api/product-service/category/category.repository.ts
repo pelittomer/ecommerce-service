@@ -71,4 +71,10 @@ export class CategoryRepository {
             .limit(30)
             .lean()
     }
+
+    async findRoots(): Promise<Category[]> {
+        return await this.categoryModel.find({ parent: null })
+            .sort({ view_count: -1 })
+            .lean()
+    }
 }

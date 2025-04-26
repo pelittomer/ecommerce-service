@@ -31,9 +31,7 @@ export class CategoryController {
 
   @Get('roots')
   fetchRoots() {
-    /*
-    This function retrieves and lists the root nodes of the category tree (top-level categories).
-    */
+    return this.categoryService.findRoots()
   }
 
   @Get('tree')

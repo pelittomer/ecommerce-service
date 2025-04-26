@@ -22,4 +22,8 @@ export class CategoryService {
     async findLeafs(): Promise<Category[]> {
         return await this.categoryRepository.findLeafs()
     }
+
+    async findRoots(): Promise<Category[]> {
+        return await this.categoryRepository.findRoots()
+    }
 }
