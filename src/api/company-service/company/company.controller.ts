@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Req, UploadedFile, UseGuards } from '@nestjs/common';
 import { CompanyService } from './company.service';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/types';
@@ -6,6 +6,9 @@ import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
+import { UploadImage } from 'src/common/decorators/upload-image.decorator';
+import { CreateCompanyDto } from './dto/create-company.dto';
+import { Request } from 'express';
 
 @Controller('company')
 export class CompanyController {
@@ -14,10 +17,13 @@ export class CompanyController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Seller)
   @Post()
-  createCompany() {
-    /*
-    This function adds a new company to the system.
-    */
+  @UploadImage()
+  createCompany(
+    @Body() userInputs: CreateCompanyDto,
+    @Req() req: Request,
+    @UploadedFile() uploadedImage: Express.Multer.File
+  ) {
+    return this.companyService.createCompany(userInputs, req, uploadedImage)
   }
 
   @UseGuards(AuthGuard, RolesGuard)
