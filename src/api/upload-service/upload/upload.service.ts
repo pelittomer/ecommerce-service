@@ -24,7 +24,7 @@ export class UploadService {
         res.send(imageBuffer)
     }
 
-    async createImage(uploadedImage: Express.Multer.File, session: ClientSession) {
+    async createImage(uploadedImage: Express.Multer.File, session?: ClientSession) {
         const compressedImageBuffer = await sharp(uploadedImage.buffer)
             .resize({ width: 1200, withoutEnlargement: true })
             .webp({ quality: 75 })

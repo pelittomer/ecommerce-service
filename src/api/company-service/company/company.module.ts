@@ -13,6 +13,7 @@ import { CompanyRepository } from './company.repository';
   imports: [
     MongooseModule.forFeature([{ name: Company.name, schema: CompanySchema }]),
     UploadModule, SharedUtilsModule
-  ]
+  ],
+  exports: [CompanyRepository]
 })
 export class CompanyModule { }
