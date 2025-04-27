@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Variation, VariationSchema } from './schemas/variation.schema';
 import { VariationOption, VariationOptionSchema } from './schemas/variation-option.schema';
 import { VariationRepository } from './variation.repository';
+import { SharedUtilsModule } from 'src/common/utils/shared-utils.module';
 
 @Module({
   controllers: [VariationController],
@@ -12,6 +13,7 @@ import { VariationRepository } from './variation.repository';
   imports: [
     MongooseModule.forFeature([{ name: Variation.name, schema: VariationSchema }]),
     MongooseModule.forFeature([{ name: VariationOption.name, schema: VariationOptionSchema }]),
+    SharedUtilsModule
   ]
 })
 export class VariationModule { }

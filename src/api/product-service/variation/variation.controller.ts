@@ -1,9 +1,10 @@
-import { Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { VariationService } from './variation.service';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/types';
+import { CreateVariationDto } from './dto/create-variation.dto';
 
 @Controller('variation')
 export class VariationController {
@@ -12,10 +13,8 @@ export class VariationController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Admin)
   @Post()
-  createVariation() {
-    /*
-    This function adds a new variation or filter option for products. For example, it could define a property like "color" with possible values such as "red," "yellow," and "white."
-    */
+  createVariation(@Body() userInputs: CreateVariationDto) {
+    return this.variationService.createVariation(userInputs)
   }
 
   @Get()
