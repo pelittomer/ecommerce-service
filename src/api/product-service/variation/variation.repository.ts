@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Variation } from "./schemas/variation.schema";
 import { VariationOption } from "./schemas/variation-option.schema";
-import { Model } from "mongoose";
+import { Model, Types } from "mongoose";
 import { CreateVariationDto } from "./dto/create-variation.dto";
 import { SharedUtilsService } from "src/common/utils/shared-utils.service";
 
@@ -26,5 +26,29 @@ export class VariationRepository {
             }))
             await this.variationOptionModel.insertMany(variationOptions, { session })
         })
+    }
+
+    async find(categoryId: Types.ObjectId) {
+        return this.variationModel.aggregate([
+            {
+                $match: {
+                    $or: [
+                        { category: categoryId },
+                        { category: { $exists: false } },
+                        { category: null }
+                    ]
+                }
+            },
+            {
+                $lookup: {
+                    from: 'variationoptions',
+                    localField: '_id',
+                    foreignField: 'variation',
+                    as: 'options'
+                }
+            },
+            { $sort: { name: 1 } },
+            { $project: { name: 1, options: 1 } }
+        ])
     }
 }

@@ -1,10 +1,12 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards, ValidationPipe } from '@nestjs/common';
 import { VariationService } from './variation.service';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/types';
 import { CreateVariationDto } from './dto/create-variation.dto';
+import { GetVariationDto } from './dto/get-variation.dto';
+import { Types } from 'mongoose';
 
 @Controller('variation')
 export class VariationController {
@@ -18,10 +20,8 @@ export class VariationController {
   }
 
   @Get()
-  fetchVariation() {
-    /*
-    This function retrieves and lists the available variation or filter options defined in the system.
-    */
+  fetchVariation(@Query(ValidationPipe) query: GetVariationDto) {
+    return this.variationService.findVariation(query.categoryId as Types.ObjectId)
   }
 
 }
