@@ -48,4 +48,16 @@ export class FavoriteService {
         const user = this.sharedUtilsService.getUserInfo(req)
         return await this.favoriteRepository.find({ user: new Types.ObjectId(user.userId) })
     }
+
+    async removeFavorites(req: Request): Promise<string> {
+        const user = this.sharedUtilsService.getUserInfo(req)
+        const userId = new Types.ObjectId(user.userId)
+
+        const favorites = await this.favoriteRepository.findExistFavorites({ user: userId })
+        const productIds = favorites.map((item) => item.product)
+
+        await this.favoriteRepository.deleteMany({ user: userId }, productIds)
+
+        return 'All products removed from favorites.'
+    }
 }

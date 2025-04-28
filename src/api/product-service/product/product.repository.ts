@@ -265,4 +265,15 @@ export class ProductRepository {
             )
         }
     }
+
+    async updateManyProductStatistic(
+        query: Partial<ProductStatistic>,
+        productIds: Types.ObjectId[],
+        session: ClientSession): Promise<void> {
+        await this.productStatisticModel.updateMany(
+            { product: { $in: productIds } },
+            { $inc: query },
+            { session }
+        )
+    }
 }

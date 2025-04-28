@@ -43,10 +43,8 @@ export class FavoriteController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Customer)
   @Delete()
-  clearFavorite() {
-    /*
-    This function removes all the items currently in the user's favorites list, effectively clearing their saved favorites.
-    */
+  clearFavorite(@Req() req: Request) {
+    return this.favoriteService.removeFavorites(req)
   }
 
 }

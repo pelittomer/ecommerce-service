@@ -47,4 +47,15 @@ export class FavoriteRepository {
                 ]
             }).lean()
     }
+
+    async findExistFavorites(queryFields: Partial<Favorite>): Promise<Pick<FavoriteDocument, '_id' | 'product'>[]> {
+        return await this.favoriteModel.find(queryFields).select('product')
+    }
+
+    async deleteMany(queryFields: Partial<Favorite>, productIds: Types.ObjectId[]): Promise<void> {
+        await this.sharedUtilsService.executeTransaction(async (session) => {
+            await this.favoriteModel.deleteMany(queryFields, { session })
+            await this.productRepository.updateManyProductStatistic({ favorites: -1 }, productIds, session)
+        })
+    }
 }
