@@ -35,4 +35,24 @@ export class CartRepository {
             await this.productRepository.findOneAndUpdateStatistic({ carts: -1 }, cart.product, session)
         })
     }
+
+    async find(queryFields: Partial<Cart>): Promise<Cart[]> {
+        return await this.cartModel.find(queryFields).populate({
+            path: 'product',
+            select: 'name images price discount',
+            populate: [
+                { path: 'brand' },
+                { path: 'category', select: 'name' },
+                { path: 'company', select: 'name' },
+            ]
+        }).populate({
+            path: 'product_stock',
+            select: 'additional_price variations',
+            populate: [
+                { path: 'variations.variation' },
+                { path: 'variations.options' }
+            ]
+        })
+            .sort({ createdAt: -1 })
+    }
 }

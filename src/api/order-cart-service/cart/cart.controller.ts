@@ -36,10 +36,8 @@ export class CartController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Customer)
   @Get()
-  fetchCart() {
-    /*
-    This function retrieves and lists all the products currently in the user's shopping cart.
-    */
+  fetchCart(@Req() req: Request) {
+    return this.cartService.findCarts(req)
   }
 
   @UseGuards(AuthGuard, RolesGuard)

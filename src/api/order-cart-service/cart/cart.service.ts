@@ -5,6 +5,7 @@ import { Request } from 'express';
 import { SharedUtilsService } from 'src/common/utils/shared-utils.service';
 import { Types } from 'mongoose';
 import { ProductRepository } from 'src/api/product-service/product/product.repository';
+import { Cart } from './schemas/cart.schema';
 
 @Injectable()
 export class CartService {
@@ -56,5 +57,10 @@ export class CartService {
         await this.cartRepository.findByIdAndDelete({ _id: cartId, user: userId, product: cartExists.product })
 
         return 'Product successfully removed from carts.'
+    }
+
+    async findCarts(req: Request): Promise<Cart[]> {
+        const user = this.sharedUtilsService.getUserInfo(req)
+        return await this.cartRepository.find({ user: new Types.ObjectId(user.userId) })
     }
 }
