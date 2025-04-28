@@ -5,6 +5,7 @@ import { FavoriteRepository } from './favorite.repository';
 import { SharedUtilsService } from 'src/common/utils/shared-utils.service';
 import { Types } from 'mongoose';
 import { ProductRepository } from 'src/api/product-service/product/product.repository';
+import { Favorite } from './schemas/favorite.schema';
 
 @Injectable()
 export class FavoriteService {
@@ -41,5 +42,10 @@ export class FavoriteService {
         await this.favoriteRepository.findByIdAndDelete(favoriteExists)
 
         return 'Product successfully removed from favorites.'
+    }
+
+    async findFavorites(req: Request): Promise<Favorite[]> {
+        const user = this.sharedUtilsService.getUserInfo(req)
+        return await this.favoriteRepository.find({ user: new Types.ObjectId(user.userId) })
     }
 }

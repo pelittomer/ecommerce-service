@@ -36,10 +36,8 @@ export class FavoriteController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Customer)
   @Get()
-  fetchFavorite() {
-    /*
-    This function retrieves and lists all the items that the user has marked as favorites.
-    */
+  fetchFavorite(@Req() req: Request) {
+    return this.favoriteService.findFavorites(req)
   }
 
   @UseGuards(AuthGuard, RolesGuard)

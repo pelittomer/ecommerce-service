@@ -34,4 +34,17 @@ export class FavoriteRepository {
             await this.productRepository.findOneAndUpdateStatistic({ favorites: -1 }, favorite.product, session)
         })
     }
+
+    async find(queryFields: Partial<Favorite>): Promise<Favorite[]> {
+        return await this.favoriteModel.find(queryFields)
+            .sort({ createdAt: -1 })
+            .populate({
+                path: 'product',
+                populate: [
+                    { path: 'brand' },
+                    { path: 'category', select: 'name' },
+                    { path: 'company', select: 'name' },
+                ]
+            }).lean()
+    }
 }
