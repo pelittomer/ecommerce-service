@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { FavoriteService } from './favorite.service';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
@@ -6,6 +6,8 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/types';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
+import { CreateFavoriteDto } from './dto/create-favorite.dto';
+import { Request } from 'express';
 
 @Controller('favorite')
 export class FavoriteController {
@@ -14,10 +16,11 @@ export class FavoriteController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Customer)
   @Post()
-  createFavorite() {
-    /*
-      This function adds a product or item to the user's list of favorites.
-     */
+  createFavorite(
+    @Body() userInputs: CreateFavoriteDto,
+    @Req() req: Request
+  ) {
+    return this.favoriteService.createFavorite(userInputs, req)
   }
 
   @UseGuards(AuthGuard, RolesGuard)

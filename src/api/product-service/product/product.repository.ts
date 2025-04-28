@@ -4,7 +4,7 @@ import { Product, ProductDocument } from "./schemas/product.schema";
 import { ProductDetail, ProductDetailDocument } from "./schemas/product-details.schema";
 import { ProductStock } from "./schemas/product-stock.schema";
 import { ProductStatistic } from "./schemas/product-statistic.schema";
-import { Model, Types } from "mongoose";
+import { ClientSession, Model, Types } from "mongoose";
 import { CreateProductDto } from "./dto/create-product.dto";
 import { SharedUtilsService } from "src/common/utils/shared-utils.service";
 import { ProductUtilsService } from "./utils/product-utils.service";
@@ -220,5 +220,49 @@ export class ProductRepository {
         ])
 
         return { productsLength, products }
+    }
+
+    async findProductExists(queryFieds: Partial<Product | Pick<ProductDocument, '_id'>>): Promise<Pick<ProductDocument, '_id'> | null> {
+        return await this.productModel.exists(queryFieds)
+    }
+
+
+    async findOneAndUpdateStatistic(
+        query: Partial<ProductStatistic>,
+        productId: Types.ObjectId,
+        session: ClientSession) {
+        const objectProductId = new Types.ObjectId(productId)
+        if (query.ratings) {
+            const { average: rate } = query.ratings
+            // Find or create product statistics
+            let productStatistic = await this.productStatisticModel.findOne({ product: objectProductId }).session(session)
+            if (!productStatistic) {
+                productStatistic = new this.productStatisticModel({
+                    product: objectProductId,
+                    ratings: {
+                        count: 0,
+                        average: 0,
+                    },
+                })
+            }
+            // Update ratings count and average
+            const currentCount = productStatistic.ratings.count
+            // Calculate new average
+            if (currentCount === 0) {
+                productStatistic.ratings.count += 1
+                productStatistic.ratings.average = rate
+            } else {
+                productStatistic.ratings.count += 1
+                productStatistic.ratings.average = (productStatistic.ratings.average * currentCount + rate) / productStatistic.ratings.count
+            }
+            // Save updated product statistics
+            await productStatistic.save({ session })
+        } else {
+            await this.productStatisticModel.findOneAndUpdate(
+                { product: objectProductId },
+                { $inc: query },
+                { session }
+            )
+        }
     }
 }

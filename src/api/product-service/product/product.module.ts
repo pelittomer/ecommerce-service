@@ -21,6 +21,7 @@ import { CompanyModule } from 'src/api/company-service/company/company.module';
     MongooseModule.forFeature([{ name: ProductStatistic.name, schema: ProductStatisticSchema }]),
     MongooseModule.forFeature([{ name: ProductStock.name, schema: ProductStockSchema }]),
     UploadModule, SharedUtilsModule, CompanyModule
-  ]
+  ],
+  exports: [ProductRepository]
 })
 export class ProductModule { }
