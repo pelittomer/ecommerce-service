@@ -10,6 +10,7 @@ import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ProductUtilsService } from './utils/product-utils.service';
 import { Request } from 'express';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Controller('product')
 export class ProductController {
@@ -33,11 +34,16 @@ export class ProductController {
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Seller)
-  @Put()
-  updateProduct() {
-    /*
-    This function modifies the details of an existing product in the system. It usually requires the product's ID and the updated information.
-    */
+  @Put(':id')
+  @UseInterceptors(AnyFilesInterceptor())
+  updateProduct(
+    @Body() userInputs: UpdateProductDto,
+    @Req() req: Request,
+    @UploadedFiles() files: Express.Multer.File[],
+    @Param('id', ParseObjectIdPipe) productId: Types.ObjectId
+  ) {
+    const groupedFiles = this.productUtilsService.validateAndGroupUploadedFiles(files)
+    return this.productService.updateProduct(userInputs, req, groupedFiles, productId)
   }
 
   @Get(':id')

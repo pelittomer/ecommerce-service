@@ -5,6 +5,8 @@ import { UploadService } from "src/api/upload-service/upload/upload.service";
 import { CompanyStatus } from "src/common/types";
 import { UpdateProductDto } from "../dto/update-product.dto";
 import { CreateProductDto } from "../dto/create-product.dto";
+import { ProductDocument } from "../schemas/product.schema";
+import { ProductDetailDocument } from "../schemas/product-details.schema";
 
 @Injectable()
 export class ProductUtilsService {
@@ -47,7 +49,7 @@ export class ProductUtilsService {
     }
 
     processCriteriaImages(criteria: UpdateProductDto['criteria'] | CreateProductDto['criteria'], images: Record<string, Types.ObjectId[]>): UpdateProductDto['criteria'] {
-        return criteria.map((criterion) => ({
+        return criteria?.map((criterion) => ({
             ...criterion,
             options: criterion.options.map((option) => ({
                 ...option,
@@ -58,15 +60,42 @@ export class ProductUtilsService {
 
     async saveUploadedImages(
         uploadedFiles: Record<string, Express.Multer.File[]>,
+        session?: ClientSession
     ): Promise<Record<string, Types.ObjectId[]>> {
         const images = await Promise.all(
             Object.entries(uploadedFiles).map(async ([uploadKey, files]) => {
                 const savedImageIds = await Promise.all(
-                    files.map(async (file) => (await this.uploadService.createImage(file))._id)
+                    files.map(async (file) => (await this.uploadService.createImage(file, session))._id)
                 )
                 return [uploadKey, savedImageIds]
             })
         )
         return Object.fromEntries(images)
+    }
+
+    getDeleteImageIds(
+        products: ProductDocument,
+        productDetails: ProductDetailDocument,
+        userInputs: UpdateProductDto): Types.ObjectId[] {
+        const deleteImageIds: Types.ObjectId[] = [];
+        const inputsImageIds = userInputs.images?.map((img) => img._id);
+        deleteImageIds.push(
+            ...products.images.filter((img) => !inputsImageIds?.includes(img._id))
+                .map((img) => img._id)
+        )
+
+        const userCriteriaImageIds = userInputs.criteria?.flatMap((criteria) => criteria.options.flatMap((option) => option.images || []))
+
+        productDetails.criteria.forEach((criteria) => {
+            criteria.options.forEach((option) => {
+                if (option.images) {
+                    deleteImageIds.push(
+                        ...option.images.filter((img) => !userCriteriaImageIds?.includes(img._id))
+                            .map((img) => img._id)
+                    )
+                }
+            })
+        })
+        return deleteImageIds
     }
 }

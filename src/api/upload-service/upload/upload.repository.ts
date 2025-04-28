@@ -23,4 +23,7 @@ export class UploadRepository {
         return await this.uploadModel.findByIdAndUpdate(imageId, uploadData, { session })
     }
 
+    async deleteMany(imageIds: Types.ObjectId[], session: ClientSession): Promise<void> {
+        await this.uploadModel.deleteMany({ _id: { $in: imageIds } }, { session })
+    }
 }

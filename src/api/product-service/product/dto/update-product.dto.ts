@@ -15,26 +15,27 @@ export class UpdateProductDto extends PartialType(BaseProductDto) {
     @Type(() => DiscountDto)
     @IsOptional()
     @ValidateNested()
-    discount: DiscountDto;
+    discount?: DiscountDto;
 
     @Type(() => Boolean)
     @IsBoolean()
-    is_published: boolean;
+    @IsOptional()
+    is_published?: boolean;
 
     @IsArray()
     @IsOptional()
     @IsMongoId({ each: true })
-    images: Types.ObjectId[]
+    images?: Types.ObjectId[]
 
     @IsArray()
     @IsOptional()
     @ValidateNested({ each: true })
     @Type(() => CreateCriteriaDto)
-    criteria: CreateCriteriaDto[]
+    criteria?: CreateCriteriaDto[]
 
     @IsArray()
     @IsOptional()
     @ValidateNested({ each: true })
     @Type(() => ProductStockDto)
-    stock: ProductStockDto[];
+    stock?: ProductStockDto[];
 }
