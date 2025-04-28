@@ -151,4 +151,74 @@ export class ProductRepository {
             productStocks,
         }
     }
+
+    async find(limit: number, startIndex: number, filter, sortCriteria) {
+        const [productsLength, products] = await Promise.all([
+            this.productModel.countDocuments(filter),
+            this.productModel.aggregate([
+                { $match: filter },
+                {
+                    $lookup: {
+                        from: 'reviews',
+                        localField: '_id',
+                        foreignField: 'product_id',
+                        as: 'reviews',
+                    },
+                },
+                {
+                    $lookup: {
+                        from: 'companies',
+                        localField: 'company',
+                        foreignField: '_id',
+                        as: 'company',
+                    },
+                },
+                {
+                    $unwind: '$company',
+                },
+                {
+                    $lookup: {
+                        from: 'productstatistics',
+                        localField: '_id',
+                        foreignField: 'product',
+                        as: 'product_statistics',
+                    },
+                },
+                {
+                    $unwind: '$company',
+                },
+                {
+                    $lookup: {
+                        from: 'brands',
+                        localField: 'brand',
+                        foreignField: '_id',
+                        as: 'brand_details',
+                    },
+                },
+                {
+                    $unwind: '$brand_details',
+                },
+                {
+                    $project: {
+                        name: 1,
+                        commentsCount: { $size: '$reviews' },
+                        images: 1,
+                        price: 1,
+                        discount: 1,
+                        statistics: '$product_statistics',
+                        brand: '$brand_details',
+                        company: {
+                            _id: '$company._id',
+                            name: '$company.name'
+                        }
+                    },
+                },
+                ...(Object.keys(sortCriteria).length > 0 ? [{ $sort: sortCriteria }] : []),
+                { $skip: startIndex },
+                { $limit: limit },
+            ]),
+        ])
+
+        return { productsLength, products }
+    }
 }

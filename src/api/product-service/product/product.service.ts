@@ -6,6 +6,7 @@ import { SharedUtilsService } from 'src/common/utils/shared-utils.service';
 import { ProductUtilsService } from './utils/product-utils.service';
 import { Types } from 'mongoose';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { PartialGetProductDto } from './dto/get-product.dto';
 
 @Injectable()
 export class ProductService {
@@ -57,5 +58,44 @@ export class ProductService {
 
     async findProductDetails(productId: Types.ObjectId) {
         return await this.productRepository.findOne(productId)
+    }
+
+    async findProducts(queryFields: PartialGetProductDto) {
+        const limit = 30
+        const page = queryFields.page || 1
+        const startIndex = (page - 1) * limit
+    
+        let filter: any = {}
+        let sortCriteria: any = {}
+    
+        if (queryFields.categoryId) {
+          filter.category = new Types.ObjectId(queryFields.categoryId)
+        }
+        if (queryFields.q) {
+          filter.name = { $regex: new RegExp(queryFields.q, 'i') };
+        }
+        if (queryFields.minPrice !== undefined && queryFields.maxPrice !== undefined) {
+          filter.price = { $gte: queryFields.minPrice, $lte: queryFields.maxPrice }
+        } else if (queryFields.minPrice !== undefined) {
+          filter.price = { $gte: queryFields.minPrice }
+        } else if (queryFields.maxPrice !== undefined) {
+          filter.price = { $lte: queryFields.maxPrice }
+        }
+        if (queryFields.company) {
+          filter.company = new Types.ObjectId(queryFields.company)
+        }
+        if (queryFields.brand) {
+          filter.brand = new Types.ObjectId(queryFields.brand)
+        }
+        if (queryFields.sort) {
+          const regex = /^(.*?)(?:_|$)(.*?)$/;
+          const match = queryFields.sort.match(regex);
+          if (match) {
+            const [sortField, sortDirection] = match
+            sortCriteria[sortField] = sortDirection === 'desc' ? -1 : 1
+          }
+        }
+    
+        return await this.productRepository.find(limit, startIndex, filter, sortCriteria)
     }
 }

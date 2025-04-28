@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Req, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, Req, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
@@ -11,6 +11,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { ProductUtilsService } from './utils/product-utils.service';
 import { Request } from 'express';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { PartialGetProductDto } from './dto/get-product.dto';
 
 @Controller('product')
 export class ProductController {
@@ -52,10 +53,8 @@ export class ProductController {
   }
 
   @Get()
-  fetchProduct() {
-    /*
-    This function retrieves and lists products based on specified filters or criteria. These filters could include categories, price range, or other product attributes.
-    */
+  fetchProduct(@Query() query: PartialGetProductDto) {
+    return this.productService.findProducts(query)
   }
 
 }
