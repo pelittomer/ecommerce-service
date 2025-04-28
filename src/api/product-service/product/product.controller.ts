@@ -47,12 +47,8 @@ export class ProductController {
   }
 
   @Get(':id')
-  fetchProductDetails(
-    @Param('id', ParseObjectIdPipe) productId: Types.ObjectId
-  ) {
-    /*
-    This function retrieves and displays the details of a specific product based on the provided product ID.
-    */
+  fetchProductDetails(@Param('id', ParseObjectIdPipe) productId: Types.ObjectId) {
+    return this.productService.findProductDetails(productId)
   }
 
   @Get()

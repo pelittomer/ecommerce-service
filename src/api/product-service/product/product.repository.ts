@@ -126,4 +126,29 @@ export class ProductRepository {
             await Promise.all([productPromise, productDetailsPromise, ...(stockPromise ?? [])])
         })
     }
+
+    async findOne(productId: Types.ObjectId) {
+        const [products, productDetails, productStatistics, productStocks] = await Promise.all([
+            this.productModel.findOne({ _id: productId })
+                .populate('brand')
+                .populate({ path: 'company', select: '-tax_id -tax_office' })
+                .populate({ path: 'shipper', select: '-api_key' })
+                .populate({ path: 'category', select: 'category image' })
+                .lean(),
+
+            this.productDetailModel.findOne({ product: productId })
+                .populate('criteria.variation criteria.options.option')
+                .lean(),
+
+            this.productStatisticModel.findOne({ product: productId }).lean(),
+            this.productStockModel.find({ product: productId }).lean()
+        ])
+
+        return {
+            products,
+            productDetails,
+            productStatistics,
+            productStocks,
+        }
+    }
 }

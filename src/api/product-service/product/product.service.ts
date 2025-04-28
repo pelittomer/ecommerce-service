@@ -44,7 +44,7 @@ export class ProductService {
         }
 
         userInputs.images = userInputs.images?.map((image) => new Types.ObjectId(image))
-        
+
         await this.productRepository.update(
             product,
             productDetails,
@@ -53,5 +53,9 @@ export class ProductService {
             productId
         )
         return 'Product successfully updated.'
+    }
+
+    async findProductDetails(productId: Types.ObjectId) {
+        return await this.productRepository.findOne(productId)
     }
 }
