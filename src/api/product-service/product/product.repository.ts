@@ -276,4 +276,8 @@ export class ProductRepository {
             { session }
         )
     }
+
+    async findStockItemById(statisticId: Types.ObjectId): Promise<ProductStock | null> {
+        return await this.productStockModel.findById(statisticId)
+    }
 }

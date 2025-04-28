@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/types';
@@ -6,6 +6,8 @@ import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
+import { CreateCartDto } from './dto/create-cart.dto';
+import { Request } from 'express';
 
 @Controller('cart')
 export class CartController {
@@ -14,10 +16,11 @@ export class CartController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Customer)
   @Post()
-  createCart() {
-    /*
-    This function adds a new product to the user's shopping cart.
-    */
+  createCart(
+    @Body() userInputs: CreateCartDto,
+    @Req() req: Request
+  ) {
+    return this.cartService.createCart(userInputs, req)
   }
 
   @UseGuards(AuthGuard, RolesGuard)

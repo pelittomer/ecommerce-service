@@ -12,7 +12,7 @@ export class Cart {
     quantity: number;
 
     @Prop({ type: Boolean, default: true })
-    is_purchasable: boolean;
+    is_purchasable?: boolean;
 
     @Prop({ type: Types.ObjectId, ref: Product.name, required: true })
     product: Types.ObjectId;
