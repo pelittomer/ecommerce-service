@@ -63,4 +63,16 @@ export class CartService {
         const user = this.sharedUtilsService.getUserInfo(req)
         return await this.cartRepository.find({ user: new Types.ObjectId(user.userId) })
     }
+
+    async removeCarts(req: Request): Promise<string> {
+        const user = this.sharedUtilsService.getUserInfo(req)
+        const userId = new Types.ObjectId(user.userId)
+
+        const carts = await this.cartRepository.find({ user: userId })
+        const productIds = carts.map((item) => item.product._id)
+
+        await this.cartRepository.deleteMany({ user: userId }, productIds)
+
+        return 'All products removed from carts.'
+    }
 }

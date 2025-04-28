@@ -55,4 +55,11 @@ export class CartRepository {
         })
             .sort({ createdAt: -1 })
     }
+
+    async deleteMany(queryFields: Partial<Cart>, productIds: Types.ObjectId[]): Promise<void> {
+        await this.sharedUtilsService.executeTransaction(async (session) => {
+            await this.cartModel.deleteMany(queryFields, { session })
+            await this.productRepository.updateManyProductStatistic({ carts: -1 }, productIds, session)
+        })
+    }
 }

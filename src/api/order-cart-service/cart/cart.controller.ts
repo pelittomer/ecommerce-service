@@ -43,10 +43,8 @@ export class CartController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Customer)
   @Delete()
-  clearCart() {
-    /*
-    This function removes all the products from the user's shopping cart, effectively emptying it.
-    */
+  clearCart(@Req() req: Request) {
+    return this.cartService.removeCarts(req)
   }
 
   @UseGuards(AuthGuard, RolesGuard)
