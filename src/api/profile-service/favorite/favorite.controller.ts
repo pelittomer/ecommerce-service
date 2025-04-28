@@ -27,11 +27,10 @@ export class FavoriteController {
   @Roles(Role.Customer)
   @Delete(':id')
   removeFavorite(
-    @Param('id', ParseObjectIdPipe) favoriteId: Types.ObjectId
+    @Param('id', ParseObjectIdPipe) favoriteId: Types.ObjectId,
+    @Req() req: Request
   ) {
-    /*
-    This function removes a specific favorite item from the user's favorites list, identified by the provided ID.
-    */
+    return this.favoriteService.removeFavorite(favoriteId, req)
   }
 
   @UseGuards(AuthGuard, RolesGuard)

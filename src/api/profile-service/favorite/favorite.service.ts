@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Request } from 'express';
 import { CreateFavoriteDto } from './dto/create-favorite.dto';
 import { FavoriteRepository } from './favorite.repository';
@@ -29,5 +29,17 @@ export class FavoriteService {
         await this.favoriteRepository.create({ user: userId, product: productId })
 
         return 'Product successfully added to favorites.'
+    }
+
+    async removeFavorite(favoriteId: Types.ObjectId, req: Request): Promise<string> {
+        const user = this.sharedUtilsService.getUserInfo(req)
+        const userId = new Types.ObjectId(user.userId)
+
+        const favoriteExists = await this.favoriteRepository.findById(favoriteId)
+        if (!favoriteExists?.user._id.equals(userId)) throw new NotFoundException('Product not found.')
+
+        await this.favoriteRepository.findByIdAndDelete(favoriteExists)
+
+        return 'Product successfully removed from favorites.'
     }
 }
