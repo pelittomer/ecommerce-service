@@ -6,6 +6,7 @@ import { SharedUtilsService } from 'src/common/utils/shared-utils.service';
 import { Types } from 'mongoose';
 import { ProductRepository } from 'src/api/product-service/product/product.repository';
 import { Cart } from './schemas/cart.schema';
+import { UpdateCartDto } from './dto/update-cart.dto';
 
 @Injectable()
 export class CartService {
@@ -74,5 +75,26 @@ export class CartService {
         await this.cartRepository.deleteMany({ user: userId }, productIds)
 
         return 'All products removed from carts.'
+    }
+
+    async updateCart(cartId: Types.ObjectId, userInputs: UpdateCartDto, req: Request): Promise<string> {
+        const { quantity } = userInputs
+
+        const user = this.sharedUtilsService.getUserInfo(req)
+        const userId = new Types.ObjectId(user.userId)
+
+        const cartExists = await this.cartRepository.findById(cartId)
+        if (!cartExists?.user._id.equals(userId)) {
+            throw new NotFoundException('Product not found.')
+        }
+
+        const stockExists = await this.productRepository.findStockItemById(cartExists.product_stock)
+        if (!stockExists || stockExists.stock_quantity < quantity) {
+            throw new BadRequestException('There is not enough stock for the requested quantity.')
+        }
+
+        await this.cartRepository.findByIdAndUpdate(cartId, { quantity })
+
+        return 'Cart successfully updated.'
     }
 }

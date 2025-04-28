@@ -8,6 +8,7 @@ import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
 import { CreateCartDto } from './dto/create-cart.dto';
 import { Request } from 'express';
+import { UpdateCartDto } from './dto/update-cart.dto';
 
 @Controller('cart')
 export class CartController {
@@ -51,11 +52,11 @@ export class CartController {
   @Roles(Role.Customer)
   @Put(':id')
   updateCart(
-    @Param('id', ParseObjectIdPipe) cartId: Types.ObjectId
+    @Param('id', ParseObjectIdPipe) cartId: Types.ObjectId,
+    @Body() userInputs: UpdateCartDto,
+    @Req() req: Request
   ) {
-    /*
-    This function modifies the quantity of a specific product in the user's shopping cart.
-    */
+    return this.cartService.updateCart(cartId,userInputs,req)
   }
 
 

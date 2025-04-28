@@ -62,4 +62,8 @@ export class CartRepository {
             await this.productRepository.updateManyProductStatistic({ carts: -1 }, productIds, session)
         })
     }
+
+    async findByIdAndUpdate(cartId: Types.ObjectId, queryFields: Partial<Cart>): Promise<void> {
+        await this.cartModel.findByIdAndUpdate(cartId, queryFields)
+    }
 }
