@@ -43,4 +43,18 @@ export class CartService {
 
         return 'Product successfully added to cart.'
     }
+
+    async removeCart(cartId: Types.ObjectId, req: Request): Promise<string> {
+        const user = this.sharedUtilsService.getUserInfo(req)
+        const userId = new Types.ObjectId(user.userId)
+
+        const cartExists = await this.cartRepository.findById(cartId)
+        if (!cartExists?.user._id.equals(userId)) {
+            throw new NotFoundException('Product not found.')
+        }
+
+        await this.cartRepository.findByIdAndDelete({ _id: cartId, user: userId, product: cartExists.product })
+
+        return 'Product successfully removed from carts.'
+    }
 }

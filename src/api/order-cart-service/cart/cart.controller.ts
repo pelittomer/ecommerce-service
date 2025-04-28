@@ -27,11 +27,10 @@ export class CartController {
   @Roles(Role.Customer)
   @Delete(':id')
   removeCart(
-    @Param('id', ParseObjectIdPipe) cartId: Types.ObjectId
+    @Param('id', ParseObjectIdPipe) cartId: Types.ObjectId,
+    @Req() req: Request
   ) {
-    /*
-    This function removes a specific product from the user's shopping cart, identified by the provided ID.
-    */
+    return this.cartService.removeCart(cartId, req)
   }
 
   @UseGuards(AuthGuard, RolesGuard)
