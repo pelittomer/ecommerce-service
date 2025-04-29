@@ -23,7 +23,7 @@ export class BrandRepository {
             const savedImage = await this.uploadService.createImage(uploadedImage, session)
             await this.brandModel.create({
                 ...userInputs,
-                logo: savedImage._id
+                logo: savedImage
             })
         })
     }

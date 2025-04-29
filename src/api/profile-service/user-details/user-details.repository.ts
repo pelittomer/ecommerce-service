@@ -36,7 +36,7 @@ export class UserDetailsRepository {
                 const newImage = existingUserDetails.avatar
                     ? await this.uploadService.updateExistingImage(uploadedImage, existingUserDetails.avatar, session)
                     : await this.uploadService.createImage(uploadedImage, session)
-                if (newImage) userInputs.avatar = newImage._id as Types.ObjectId
+                if (newImage) userInputs.avatar = newImage as Types.ObjectId
             }
 
             await this.userDetailsModel.findOneAndUpdate(queryFields, userInputs, { session })

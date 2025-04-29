@@ -24,21 +24,46 @@ export class UploadService {
         res.send(imageBuffer)
     }
 
-    async createImage(uploadedImage: Express.Multer.File, session?: ClientSession) {
-        const compressedImageBuffer = await sharp(uploadedImage.buffer)
-            .resize({ width: 1200, withoutEnlargement: true })
-            .webp({ quality: 75 })
-            .toBuffer()
+    async createImage(
+        uploadedImage: Express.Multer.File | Express.Multer.File[],
+        session?: ClientSession
+    ): Promise<Types.ObjectId | Types.ObjectId[]> {
+        if (Array.isArray(uploadedImage)) {
+            const uploadPromises = uploadedImage.map(async (image) => {
+                const compressedImageBuffer = await sharp(image.buffer)
+                    .resize({ width: 1200, withoutEnlargement: true })
+                    .webp({ quality: 75 })
+                    .toBuffer()
 
-        const encodedFileContent = compressedImageBuffer.toString('base64')
+                const encodedFileContent = compressedImageBuffer.toString('base64')
 
-        const uploadData: CreateUploadDto = {
-            filename: uploadedImage.originalname,
-            fileContent: encodedFileContent,
-            fileType: uploadedImage.mimetype
+                return {
+                    filename: image.originalname,
+                    fileContent: encodedFileContent,
+                    fileType: image.mimetype,
+                } as CreateUploadDto
+            })
+
+            const uploadImages = await Promise.all(uploadPromises)
+            const savedImages = await this.uploadRepository.insertMany(uploadImages, session)
+            return savedImages.map((file) => file._id as Types.ObjectId)
+        } else {
+            const compressedImageBuffer = await sharp(uploadedImage.buffer)
+                .resize({ width: 1200, withoutEnlargement: true })
+                .webp({ quality: 75 })
+                .toBuffer()
+
+            const encodedFileContent = compressedImageBuffer.toString('base64')
+
+            const uploadData: CreateUploadDto = {
+                filename: uploadedImage.originalname,
+                fileContent: encodedFileContent,
+                fileType: uploadedImage.mimetype
+            }
+
+            const image = await this.uploadRepository.create(uploadData, session)
+            return image._id as Types.ObjectId
         }
-
-        return await this.uploadRepository.create(uploadData, session)
     }
 
     async updateExistingImage(uploadedImage: Express.Multer.File, imageId: Types.ObjectId, session: ClientSession) {

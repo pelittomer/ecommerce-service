@@ -280,4 +280,8 @@ export class ProductRepository {
     async findStockItemById(statisticId: Types.ObjectId): Promise<ProductStock | null> {
         return await this.productStockModel.findById(statisticId)
     }
+
+    async findById(productId): Promise<ProductDocument | null> {
+        return this.productModel.findById(productId)
+    }
 }

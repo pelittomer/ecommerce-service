@@ -12,6 +12,7 @@ import { OrderRepository } from './order.repository';
   imports: [
     MongooseModule.forFeature([{ name: Order.name, schema: OrderSchema }]),
     MongooseModule.forFeature([{ name: OrderItem.name, schema: OrderItemSchema }]),
-  ]
+  ],
+  exports: [OrderRepository]
 })
 export class OrderModule { }

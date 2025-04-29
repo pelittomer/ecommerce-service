@@ -1,9 +1,12 @@
-import { Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UploadedFiles, UseGuards } from '@nestjs/common';
 import { ReviewService } from './review.service';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/types';
+import { UploadReviewImage } from './decorators/review-upload-image.decorator';
+import { CreateReviewDto } from './dto/create-review.dto';
+import { Request } from 'express';
 
 @Controller('review')
 export class ReviewController {
@@ -12,10 +15,13 @@ export class ReviewController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Customer)
   @Post()
-  createReview() {
-    /*
-    This function allows a user to create and submit a new review for a product.
-    */
+  @UploadReviewImage()
+  createReview(
+    @Body() userInputs: CreateReviewDto,
+    @Req() req: Request,
+    @UploadedFiles() files: Express.Multer.File[]
+  ) {
+    return this.reviewService.createReview(userInputs, req, files)
   }
 
   @Get()

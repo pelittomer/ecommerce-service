@@ -31,7 +31,7 @@ export class CompanyRepository {
                 {
                     ...userInputs,
                     user: userId,
-                    logo: savedImage._id as Types.ObjectId
+                    logo: savedImage
                 }
             ], { session })
         })

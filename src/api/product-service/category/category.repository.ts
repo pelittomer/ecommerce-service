@@ -60,7 +60,7 @@ export class CategoryRepository {
                 this.uploadService.createImage(uploadedImage.icon[0], session)
             ])
 
-            const categoryData = { ...userInputs, icon: savedIcon._id as Types.ObjectId, image: savedImage._id as Types.ObjectId }
+            const categoryData = { ...userInputs, icon: savedIcon as Types.ObjectId, image: savedImage as Types.ObjectId }
             userInputs.parent
                 ? await this.createSubCategory(categoryData, userInputs.parent, session)
                 : await this.createRootCategory(categoryData, session)

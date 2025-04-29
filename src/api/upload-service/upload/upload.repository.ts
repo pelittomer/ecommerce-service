@@ -26,4 +26,8 @@ export class UploadRepository {
     async deleteMany(imageIds: Types.ObjectId[], session: ClientSession): Promise<void> {
         await this.uploadModel.deleteMany({ _id: { $in: imageIds } }, { session })
     }
+
+    async insertMany(uploadImages: CreateUploadDto[], session?: ClientSession): Promise<UploadDocument[]> {
+        return await this.uploadModel.insertMany(uploadImages, { session })
+    }
 }

@@ -65,7 +65,7 @@ export class ProductUtilsService {
         const images = await Promise.all(
             Object.entries(uploadedFiles).map(async ([uploadKey, files]) => {
                 const savedImageIds = await Promise.all(
-                    files.map(async (file) => (await this.uploadService.createImage(file, session))._id)
+                    files.map(async (file) => (await this.uploadService.createImage(file, session)))
                 )
                 return [uploadKey, savedImageIds]
             })

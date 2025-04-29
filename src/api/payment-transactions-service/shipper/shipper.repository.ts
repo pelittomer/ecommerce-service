@@ -22,7 +22,7 @@ export class ShipperRepository {
             const savedImage = await this.uploadService.createImage(uploadedImage, session)
             await this.shipperModel.create([{
                 ...userInputs,
-                logo: savedImage._id,
+                logo: savedImage,
             }], { session })
         })
     }
