@@ -6,11 +6,13 @@ import { SharedUtilsService } from 'src/common/utils/shared-utils.service';
 import { ProductRepository } from 'src/api/product-service/product/product.repository';
 import { Types } from 'mongoose';
 import { OrderRepository } from 'src/api/order-cart-service/order/order.repository';
+import { GetReviewDto } from './dto/get-review.dto';
+import { Review } from './schemas/review.schema';
 
 @Injectable()
 export class ReviewService {
     constructor(
-        private readonly ReviewRepository: ReviewRepository,
+        private readonly reviewRepository: ReviewRepository,
         private readonly productRepository: ProductRepository,
         private readonly orderRepository: OrderRepository,
         private readonly sharedUtilsService: SharedUtilsService,
@@ -29,10 +31,10 @@ export class ReviewService {
         if (!productExits) {
             throw new NotFoundException('Product not found!')
         }
-        
+
         const isPurchased = await this.orderRepository.findOneOrderItemExists({ user: userId, product })
 
-        await this.ReviewRepository.create(
+        await this.reviewRepository.create(
             {
                 ...elementWithoutProductId,
                 product: new Types.ObjectId(userInputs.product),
@@ -43,5 +45,9 @@ export class ReviewService {
         )
 
         return 'Review successfully created.'
+    }
+
+    async findReviews(query: GetReviewDto): Promise<Review[]> {
+        return this.reviewRepository.find(query)
     }
 }
