@@ -1,4 +1,7 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateQuestionDto } from './create-question.dto';
+import { IsNotEmpty, IsString } from "class-validator";
 
-export class UpdateQuestionDto extends PartialType(CreateQuestionDto) {}
+export class UpdateQuestionDto {
+    @IsString()
+    @IsNotEmpty()
+    answer: string;
+}

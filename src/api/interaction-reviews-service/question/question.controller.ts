@@ -8,6 +8,7 @@ import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { Request } from 'express';
+import { UpdateQuestionDto } from './dto/update-question.dto';
 
 @Controller('question')
 export class QuestionController {
@@ -20,18 +21,18 @@ export class QuestionController {
     @Body() userInputs: CreateQuestionDto,
     @Req() req: Request
   ) {
-    return this.questionService.createQuestion(userInputs,req)
-  } 
+    return this.questionService.createQuestion(userInputs, req)
+  }
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Seller)
   @Put(':id')
   createAnswer(
-    @Param('id', ParseObjectIdPipe) questionId: Types.ObjectId
+    @Param('id', ParseObjectIdPipe) questionId: Types.ObjectId,
+    @Body() userInputs: UpdateQuestionDto,
+    @Req() req: Request
   ) {
-    /*
-    This function allows an administrator or seller to create and submit an answer to a specific product question.
-    */
+    return this.questionService.createAnswer(questionId, userInputs, req)
   }
 
   @Get()
