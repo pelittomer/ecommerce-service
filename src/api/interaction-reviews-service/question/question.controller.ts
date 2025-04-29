@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, Req, UseGuards, ValidationPipe } from '@nestjs/common';
 import { QuestionService } from './question.service';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
@@ -9,6 +9,7 @@ import { Types } from 'mongoose';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { Request } from 'express';
 import { UpdateQuestionDto } from './dto/update-question.dto';
+import { GetQuestionDto } from './dto/get-question.dto';
 
 @Controller('question')
 export class QuestionController {
@@ -36,10 +37,8 @@ export class QuestionController {
   }
 
   @Get()
-  fetchQuestion() {
-    /*
-    This function retrieves and lists all the questions and their corresponding answers associated with a specific product, identified by its product_id.
-    */
+  fetchQuestion(@Query(ValidationPipe) query: GetQuestionDto) {
+    return this.questionService.findQuestions(query)
   }
 
 }

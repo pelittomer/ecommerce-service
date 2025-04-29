@@ -7,6 +7,8 @@ import { Types } from 'mongoose';
 import { ProductRepository } from 'src/api/product-service/product/product.repository';
 import { UpdateQuestionDto } from './dto/update-question.dto';
 import { CompanyRepository } from 'src/api/company-service/company/company.repository';
+import { GetQuestionDto } from './dto/get-question.dto';
+import { Question } from './schemas/question.schema';
 
 @Injectable()
 export class QuestionService {
@@ -61,5 +63,9 @@ export class QuestionService {
         })
 
         return 'Your answer has been successfully created.'
+    }
+
+    async findQuestions(query: GetQuestionDto): Promise<Question[]> {
+        return this.questionRepository.find(query)
     }
 }
