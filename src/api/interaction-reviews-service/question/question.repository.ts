@@ -8,5 +8,8 @@ export class QuestionRepository {
     constructor(
         @InjectModel(Question.name) private questionModel: Model<Question>
     ) { }
-    
+
+    async createQuestion(userInputs: Partial<Question>): Promise<void> {
+        await this.questionModel.create(userInputs)
+    }
 }
