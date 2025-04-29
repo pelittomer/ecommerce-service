@@ -22,10 +22,8 @@ export class OrderController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Customer)
   @Get()
-  fetchOrder() {
-    /*
-    This function retrieves and lists all the orders placed by the authenticated user.
-    */
+  fetchOrder(@Req() req: Request) {
+    return this.orderService.findOrders(req)
   }
 
   @UseGuards(AuthGuard, RolesGuard)

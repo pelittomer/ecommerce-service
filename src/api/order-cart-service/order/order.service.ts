@@ -6,6 +6,7 @@ import { Types } from 'mongoose';
 import { CartRepository } from '../cart/cart.repository';
 import { AddressRepository } from 'src/api/profile-service/address/address.repository';
 import { OrderUtilsService } from './utils/order-utils.service';
+import { Order } from './schemas/order.schema';
 
 @Injectable()
 export class OrderService {
@@ -38,5 +39,10 @@ export class OrderService {
         await this.orderRepository.create(carts, defaultAddress, totalAmount, userId)
 
         return 'Order successfully created.'
+    }
+
+    async findOrders(req: Request): Promise<Order[]> {
+        const user = this.sharedUtilsService.getUserInfo(req)
+        return await this.orderRepository.find({ user: new Types.ObjectId(user.userId) })
     }
 }

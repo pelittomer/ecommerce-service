@@ -114,4 +114,8 @@ export class OrderRepository {
             await this.cartRepository.deletePurchasableProducts({ user: userId, is_purchasable: true }, session)
         })
     }
+
+    async find(queryFields: Partial<Order>): Promise<Order[]> {
+        return this.orderModel.find(queryFields).sort({ createdAt: -1 }).lean()
+    }
 }
