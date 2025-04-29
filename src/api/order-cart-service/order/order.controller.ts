@@ -30,11 +30,10 @@ export class OrderController {
   @Roles(Role.Customer)
   @Get(':id')
   fetchOrderDetails(
-    @Param('id', ParseObjectIdPipe) orderId: Types.ObjectId
+    @Param('id', ParseObjectIdPipe) orderId: Types.ObjectId,
+    @Req() req: Request
   ) {
-    /*
-    This function retrieves and displays the detailed information for a specific order, identified by the provided order ID.
-    */
+    return this.orderService.findOrderDetails(orderId, req)
   }
 
 }

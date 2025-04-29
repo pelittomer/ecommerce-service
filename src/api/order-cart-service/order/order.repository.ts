@@ -118,4 +118,9 @@ export class OrderRepository {
     async find(queryFields: Partial<Order>): Promise<Order[]> {
         return this.orderModel.find(queryFields).sort({ createdAt: -1 }).lean()
     }
+
+    async findOrderItem(queryFields: Pick<OrderItem, 'user' | 'order'>): Promise<OrderItem[]> {
+        return await this.orderItemModel.find(queryFields)
+            .sort({ price: -1 })
+    }
 }

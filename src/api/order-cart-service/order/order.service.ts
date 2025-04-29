@@ -7,6 +7,7 @@ import { CartRepository } from '../cart/cart.repository';
 import { AddressRepository } from 'src/api/profile-service/address/address.repository';
 import { OrderUtilsService } from './utils/order-utils.service';
 import { Order } from './schemas/order.schema';
+import { OrderItem } from './schemas/order-item.schema';
 
 @Injectable()
 export class OrderService {
@@ -44,5 +45,13 @@ export class OrderService {
     async findOrders(req: Request): Promise<Order[]> {
         const user = this.sharedUtilsService.getUserInfo(req)
         return await this.orderRepository.find({ user: new Types.ObjectId(user.userId) })
+    }
+
+    async findOrderDetails(orderId: Types.ObjectId, req: Request): Promise<OrderItem[]> {
+        const user = this.sharedUtilsService.getUserInfo(req)
+        return await this.orderRepository.findOrderItem({
+            user: new Types.ObjectId(user.userId),
+            order: orderId
+        })
     }
 }
