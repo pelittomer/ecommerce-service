@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { ClientSession, Model, Types } from "mongoose";
-import { Address } from "./schemas/address.schema";
+import { Address, AddressDocument } from "./schemas/address.schema";
 import { CreateAddressDto } from "./dto/create-address.dto";
 import { SharedUtilsService } from "src/common/utils/shared-utils.service";
 
@@ -75,5 +75,9 @@ export class AddressRepository {
                 }
             }
         })
+    }
+
+    async findIsDefault(queryFields: Pick<Address, 'user' | 'is_default'>): Promise<Pick<AddressDocument, '_id'> | null> {
+        return await this.addressModel.exists(queryFields)
     }
 }

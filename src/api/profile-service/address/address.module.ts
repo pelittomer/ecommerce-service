@@ -12,6 +12,7 @@ import { SharedUtilsModule } from 'src/common/utils/shared-utils.module';
   imports: [
     MongooseModule.forFeature([{ name: Address.name, schema: AddressSchema }]),
     SharedUtilsModule
-  ]
+  ],
+  exports: [AddressRepository]
 })
 export class AddressModule { }

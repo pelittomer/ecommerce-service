@@ -13,6 +13,7 @@ import { SharedUtilsModule } from 'src/common/utils/shared-utils.module';
   imports: [
     MongooseModule.forFeature([{ name: Cart.name, schema: CartSchema }]),
     ProductModule, SharedUtilsModule
-  ]
+  ],
+  exports: [CartRepository]
 })
 export class CartModule { }

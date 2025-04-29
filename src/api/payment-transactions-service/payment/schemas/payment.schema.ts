@@ -33,7 +33,7 @@ export type PaymentDocument = Payment & Document;
 
 @Schema({ timestamps: true })
 export class Payment {
-    @Prop({ type: String, enum: PaymentMethod, required: true })
+    @Prop({ type: String, enum: PaymentMethod })
     payment_method: PaymentMethod;
 
     @Prop({ type: String, enum: PaymentStatus, default: PaymentStatus.Pending })

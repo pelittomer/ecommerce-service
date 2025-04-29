@@ -284,4 +284,8 @@ export class ProductRepository {
     async findById(productId): Promise<ProductDocument | null> {
         return this.productModel.findById(productId)
     }
+
+    async bulkUpdateStocks(queryFields: any, session: ClientSession) {
+        return await this.productStockModel.bulkWrite(queryFields, { session })
+    }
 }

@@ -1,10 +1,19 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Cart, CartDocument } from "./schemas/cart.schema";
-import { Model, Types } from "mongoose";
+import { ClientSession, Model, Types } from "mongoose";
 import { SharedUtilsService } from "src/common/utils/shared-utils.service";
 import { ProductRepository } from "src/api/product-service/product/product.repository";
-import { FavoriteDocument } from "src/api/profile-service/favorite/schemas/favorite.schema";
+import { ProductDocument } from "src/api/product-service/product/schemas/product.schema";
+import { ProductStockDocument } from "src/api/product-service/product/schemas/product-stock.schema";
+
+export type PopulatedProduct = Pick<ProductDocument, '_id' | 'price' | 'discount'>
+export type PopulatedProductStock = Pick<ProductStockDocument, '_id' | 'additional_price' | 'is_limited' | 'auto_replenish' | 'replenish_quantity' | 'stock_quantity'>
+
+export type PopulateCart = Omit<Cart, 'product' | 'product_stock'> & {
+    product: PopulatedProduct;
+    product_stock: PopulatedProductStock;
+}
 
 @Injectable()
 export class CartRepository {
@@ -65,5 +74,25 @@ export class CartRepository {
 
     async findByIdAndUpdate(cartId: Types.ObjectId, queryFields: Partial<Cart>): Promise<void> {
         await this.cartModel.findByIdAndUpdate(cartId, queryFields)
+    }
+
+    async findIsPurschable(queryFields: Partial<Cart>): Promise<PopulateCart[]> {
+        return await this.cartModel.find(queryFields)
+            .populate<{ product: PopulatedProduct }>({
+                path: 'product',
+                select: 'price discount'
+            })
+            .populate<{ product_stock: PopulatedProductStock }>({
+                path: 'product_stock',
+                select: 'additional_price is_limited auto_replenish stock_quantity'
+            })
+    }
+
+    async updateBulkWrite(queryFields: any, session: ClientSession) {
+        await this.cartModel.bulkWrite(queryFields, { session })
+    }
+
+    async deletePurchasableProducts(queryFieds: Pick<Cart, 'user' | 'is_purchasable'>, session: ClientSession): Promise<void> {
+        await this.cartModel.deleteMany(queryFieds, { session })
     }
 }

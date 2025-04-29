@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/types';
@@ -6,6 +6,7 @@ import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
+import { Request } from 'express';
 
 @Controller('order')
 export class OrderController {
@@ -14,10 +15,8 @@ export class OrderController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Customer)
   @Post()
-  createOrder() {
-    /*
-    This function creates a new order based on the user's current cart and shipping information.
-    */
+  createOrder(@Req() req: Request) {
+    return this.orderService.createOrder(req)
   }
 
   @UseGuards(AuthGuard, RolesGuard)
