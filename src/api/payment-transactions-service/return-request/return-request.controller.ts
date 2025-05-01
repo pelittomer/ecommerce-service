@@ -20,13 +20,4 @@ export class ReturnRequestController {
   ) {
     return this.returnRequestService.createReturnRequest(userInputs, req)
   }
-
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.Seller)
-  @Put()
-  updateReturnRequest() {
-    /*
-    This function updates the status or details of an existing return request (for example, approving or rejecting the return).
-    */
-  }
 }
