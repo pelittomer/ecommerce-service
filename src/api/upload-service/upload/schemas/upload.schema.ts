@@ -5,13 +5,13 @@ export type UploadDocument = Upload & Document;
 
 @Schema({ timestamps: true })
 export class Upload {
-    @Prop({ required: true })
+    @Prop()
     filename: string;
 
-    @Prop({ required: true })
+    @Prop()
     fileContent: string;
 
-    @Prop({ required: true })
+    @Prop()
     fileType: string;
 };
 

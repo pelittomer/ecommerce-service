@@ -14,20 +14,20 @@ export class UploadRepository {
         return await this.uploadModel.findById(imageId).lean()
     }
 
-    async create(uploadData: CreateUploadDto, session?: ClientSession): Promise<UploadDocument> {
-        const [newImage] = await this.uploadModel.create([uploadData], { session })
+    async create(fields: object, session: ClientSession): Promise<UploadDocument> {
+        const [newImage] = await this.uploadModel.create([fields], { session })
         return newImage
     }
 
-    async findByIdAndUpdate(uploadData: CreateUploadDto, imageId: Types.ObjectId, session: ClientSession): Promise<UploadDocument | null> {
-        return await this.uploadModel.findByIdAndUpdate(imageId, uploadData, { session })
+    async findOneAndUpdate(uploadData: CreateUploadDto, imageId: Types.ObjectId): Promise<UploadDocument | null> {
+        return await this.uploadModel.findOneAndUpdate({ _id: imageId }, uploadData, { upsert: true })
     }
 
     async deleteMany(imageIds: Types.ObjectId[], session: ClientSession): Promise<void> {
         await this.uploadModel.deleteMany({ _id: { $in: imageIds } }, { session })
     }
 
-    async insertMany(uploadImages: CreateUploadDto[], session?: ClientSession): Promise<UploadDocument[]> {
-        return await this.uploadModel.insertMany(uploadImages, { session })
+    async insertMany(fields: object[], session: ClientSession): Promise<UploadDocument[]> {
+        return await this.uploadModel.insertMany(fields, { session })
     }
 }

@@ -60,7 +60,7 @@ export class ProductUtilsService {
 
     async saveUploadedImages(
         uploadedFiles: Record<string, Express.Multer.File[]>,
-        session?: ClientSession
+        session: ClientSession
     ): Promise<Record<string, Types.ObjectId[]>> {
         const images = await Promise.all(
             Object.entries(uploadedFiles).map(async ([uploadKey, files]) => {

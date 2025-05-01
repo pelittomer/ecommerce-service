@@ -35,11 +35,10 @@ export class ProductRepository {
             description, short_description, features, criteria
         } = userInputs
 
-        // Another potential point of timeout if creating product details, images, stock, or statistics takes too long.
-        const images = await this.productUtilsService.saveUploadedImages(uploadedFiles)
-        const processedCriteria = this.productUtilsService.processCriteriaImages(criteria, images)
-
         await this.sharedUtilsService.executeTransaction(async (session) => {
+            const images = await this.productUtilsService.saveUploadedImages(uploadedFiles, session)
+            const processedCriteria = this.productUtilsService.processCriteriaImages(criteria, images)
+            
             const [product] = await this.productModel.create([{
                 name, price,
                 brand: new Types.ObjectId(brand),

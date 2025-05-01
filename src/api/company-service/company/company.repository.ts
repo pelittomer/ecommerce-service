@@ -42,16 +42,13 @@ export class CompanyRepository {
     }
 
     async findByIdAndUpdate(company: CompanyDocument, userInputs: Partial<Company>, uploadedImage: Express.Multer.File): Promise<void> {
-        await this.sharedUtilsService.executeTransaction(async (session) => {
-            if (uploadedImage && company && company.logo) {
-                await this.uploadService.updateExistingImage(uploadedImage, company.logo, session)
-            }
-            await this.companyModel.findByIdAndUpdate(
-                company._id,
-                userInputs,
-                { session }
-            )
-        })
+        if (uploadedImage && company && company.logo) {
+            await this.uploadService.updateExistingImage(uploadedImage, company.logo)
+        }
+        await this.companyModel.findByIdAndUpdate(
+            company._id,
+            userInputs,
+        )
     }
 
     async findById(companyId: Types.ObjectId): Promise<Company | null> {

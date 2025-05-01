@@ -34,7 +34,7 @@ export class UserDetailsRepository {
         await this.sharedUtilsService.executeTransaction(async (session) => {
             if (uploadedImage) {
                 const newImage = existingUserDetails.avatar
-                    ? await this.uploadService.updateExistingImage(uploadedImage, existingUserDetails.avatar, session)
+                    ? await this.uploadService.updateExistingImage(uploadedImage, existingUserDetails.avatar)
                     : await this.uploadService.createImage(uploadedImage, session)
                 if (newImage) userInputs.avatar = newImage as Types.ObjectId
             }
