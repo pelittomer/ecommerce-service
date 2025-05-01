@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Order, OrderDocument } from "./schemas/order.schema";
 import { Model, Types } from "mongoose";
-import { OrderItem } from "./schemas/order-item.schema";
+import { OrderItem, OrderItemDocument } from "./schemas/order-item.schema";
 import { AddressDocument } from "src/api/profile-service/address/schemas/address.schema";
 import { OrderUtilsService } from "./utils/order-utils.service";
 import { ProductRepository } from "src/api/product-service/product/product.repository";
@@ -122,5 +122,9 @@ export class OrderRepository {
     async findOrderItem(queryFields: Pick<OrderItem, 'user' | 'order'>): Promise<OrderItem[]> {
         return await this.orderItemModel.find(queryFields)
             .sort({ price: -1 })
+    }
+
+    async findOneOrderItem(queryFields: Pick<OrderItemDocument, '_id' | 'user'>): Promise<OrderItem | null> {
+        return await this.orderItemModel.findOne(queryFields).lean()
     }
 }

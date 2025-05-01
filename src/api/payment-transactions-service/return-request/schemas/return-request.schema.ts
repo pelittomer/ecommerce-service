@@ -34,7 +34,6 @@ export class ReturnRequest {
     @Prop({ type: String })
     shippingTrackingCode?: string;
 
-
     @Prop({ type: Types.ObjectId, ref: OrderItem.name, required: true })
     orderItem: Types.ObjectId;
 

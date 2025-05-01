@@ -9,4 +9,8 @@ export class ReturnRequestRepository {
         @InjectModel(ReturnRequest.name) private returnRequestModel: Model<ReturnRequest>
     ) { }
 
+    async create(userInputs: Partial<ReturnRequest>): Promise<void> {
+        await this.returnRequestModel.create(userInputs)
+    }
+
 }
