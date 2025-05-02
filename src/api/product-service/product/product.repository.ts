@@ -38,7 +38,7 @@ export class ProductRepository {
         await this.sharedUtilsService.executeTransaction(async (session) => {
             const images = await this.productUtilsService.saveUploadedImages(uploadedFiles, session)
             const processedCriteria = this.productUtilsService.processCriteriaImages(criteria, images)
-            
+
             const [product] = await this.productModel.create([{
                 name, price,
                 brand: new Types.ObjectId(brand),
@@ -140,7 +140,8 @@ export class ProductRepository {
                 .lean(),
 
             this.productStatisticModel.findOne({ product: productId }).lean(),
-            this.productStockModel.find({ product: productId }).lean()
+            this.productStockModel.find({ product: productId }).lean(),
+            this.findOneAndUpdateStatistic({ views: 1 }, productId)
         ])
 
         return {
@@ -229,12 +230,12 @@ export class ProductRepository {
     async findOneAndUpdateStatistic(
         query: Partial<ProductStatistic>,
         productId: Types.ObjectId,
-        session: ClientSession) {
+        session?: ClientSession) {
         const objectProductId = new Types.ObjectId(productId)
         if (query.ratings) {
             const { average: rate } = query.ratings
             // Find or create product statistics
-            let productStatistic = await this.productStatisticModel.findOne({ product: objectProductId }).session(session)
+            let productStatistic = await this.productStatisticModel.findOne({ product: objectProductId })
             if (!productStatistic) {
                 productStatistic = new this.productStatisticModel({
                     product: objectProductId,
