@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res, UseFilters, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RoleParam } from './lib/role-validation.pipe';
@@ -7,6 +7,8 @@ import { Role } from 'src/common/types';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { Request, Response } from 'express';
+import { hours, minutes, seconds, Throttle } from '@nestjs/throttler';
+import { SignInRateLimitExceptionFilter } from './utils/signInExceptionFilter';
 
 @Controller('user/auth')
 export class AuthController {
@@ -25,6 +27,12 @@ export class AuthController {
     return this.authService.register(userInputs, role)
   }
 
+  @UseFilters(SignInRateLimitExceptionFilter)
+  @Throttle({
+    short: { ttl: seconds(60), limit: 3 },
+    medium: { ttl: minutes(60), limit: 6 },
+    long: { ttl: hours(24), limit: 9 },
+  })
   @Post(':role/sign-in')
   signIn(
     @Body() userInputs: LoginDto,

@@ -24,6 +24,8 @@ import { ReviewModule } from './api/interaction-reviews-service/review/review.mo
 import { ShipperModule } from './api/payment-transactions-service/shipper/shipper.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { LoggerModule } from './common/logging/logger.module';
+import { minutes, seconds, ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -46,6 +48,23 @@ import { LoggerModule } from './common/logging/logger.module';
         secret: configService.get('auth.secret_key', { infer: true })
       })
     }),
+    ThrottlerModule.forRoot([
+      {
+        name: 'short',
+        ttl: seconds(1),
+        limit: 10,
+      },
+      {
+        name: 'medium',
+        ttl: seconds(60),
+        limit: 100,
+      },
+      {
+        name: 'long',
+        ttl: minutes(5),
+        limit: 500,
+      },
+    ]),
     ScheduleModule.forRoot(),
     AuthModule,
     UserModule,
@@ -66,6 +85,12 @@ import { LoggerModule } from './common/logging/logger.module';
     ReviewModule,
     ShipperModule,
     LoggerModule
-  ]
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard
+    }
+  ],
 })
 export class AppModule { }

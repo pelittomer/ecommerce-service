@@ -60,7 +60,7 @@ export class CustomLoggerService extends ConsoleLogger implements LoggerService 
         try {
             await this.logModel.create(logEntry)
         } catch (error) {
-            console.error('Veritabanına log kaydı sırasında hata oluştu:', error)
+            console.error('An error occurred while logging to the database:', error)
         }
     }
 }
