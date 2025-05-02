@@ -22,6 +22,7 @@ import { PaymentModule } from './api/payment-transactions-service/payment/paymen
 import { QuestionModule } from './api/interaction-reviews-service/question/question.module';
 import { ReviewModule } from './api/interaction-reviews-service/review/review.module';
 import { ShipperModule } from './api/payment-transactions-service/shipper/shipper.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { ShipperModule } from './api/payment-transactions-service/shipper/shippe
         secret: configService.get('auth.secret_key', { infer: true })
       })
     }),
+    ScheduleModule.forRoot(),
     AuthModule,
     UserModule,
     UserDetailsModule,
@@ -66,4 +68,4 @@ import { ShipperModule } from './api/payment-transactions-service/shipper/shippe
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule { }

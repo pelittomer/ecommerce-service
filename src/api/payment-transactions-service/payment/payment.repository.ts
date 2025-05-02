@@ -13,7 +13,15 @@ export class PaymentRepository {
         await this.paymentModel.create([userInputs], { session })
     }
 
-    async findOneAndUpdate(userInputs: Partial<Payment>, queryFields: Pick<PaymentDocument, '_id' | 'user'>) {
+    async findOneAndUpdate(userInputs: Partial<Payment>, queryFields: Partial<Pick<PaymentDocument, '_id' | 'user'>>) {
         await this.paymentModel.findOneAndUpdate(queryFields, userInputs)
+    }
+
+    async find(queryFields: Partial<Payment>): Promise<PaymentDocument[]> {
+        return await this.paymentModel.find(queryFields)
+    }
+
+    async bulkWrite(fields: any): Promise<any> {
+        return await this.paymentModel.bulkWrite(fields)
     }
 }
