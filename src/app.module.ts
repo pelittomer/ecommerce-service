@@ -23,6 +23,7 @@ import { QuestionModule } from './api/interaction-reviews-service/question/quest
 import { ReviewModule } from './api/interaction-reviews-service/review/review.module';
 import { ShipperModule } from './api/payment-transactions-service/shipper/shipper.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { LoggerModule } from './common/logging/logger.module';
 
 @Module({
   imports: [
@@ -64,8 +65,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     QuestionModule,
     ReviewModule,
     ShipperModule,
-  ],
-  controllers: [],
-  providers: [],
+    LoggerModule
+  ]
 })
 export class AppModule { }
