@@ -2,7 +2,7 @@ import { BadRequestException, ForbiddenException, HttpStatus, Injectable, Logger
 import { RegisterDto } from './dto/register.dto';
 import { Role } from 'src/common/types';
 import { UserRepository } from '../user/user.repository';
-import { compare, genSalt, hash } from 'bcrypt';
+import { compare, genSalt, hash } from 'bcryptjs';
 import { LoginDto } from './dto/login.dto';
 import { CookieOptions, Request, Response } from 'express';
 import { Types } from 'mongoose';
