@@ -1,8 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, Types } from "mongoose";
+import { Types } from "mongoose";
 import { Category } from "../../category/schemas/category.schema";
-
-export type VariationDocument = Variation & Document;
 
 @Schema({ timestamps: true })
 export class Variation {

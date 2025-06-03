@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Types } from "mongoose";
 import { Product } from "./product.schema";
-import { Variation } from "../../variation/schemas/variation.schema";
-import { VariationOption } from "../../variation/schemas/variation-option.schema";
+import { Variation } from "../../variation/entities/variation.entity";
+import { VariationOption } from "../../variation/entities/variation-option.entity";
 import { Upload } from "src/api/upload-service/upload/schemas/upload.schema";
 
 interface Feature {

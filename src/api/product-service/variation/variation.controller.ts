@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, Query, UseGuards, ValidationPipe } from '@nestjs/common';
-import { VariationService } from './variation.service';
+import { VariationService } from './service/variation.service';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
@@ -15,13 +15,12 @@ export class VariationController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Admin)
   @Post()
-  createVariation(@Body() userInputs: CreateVariationDto) {
-    return this.variationService.createVariation(userInputs)
+  createVariation(@Body() payload: CreateVariationDto) {
+    return this.variationService.createVariation(payload)
   }
 
   @Get()
   fetchVariation(@Query(ValidationPipe) query: GetVariationDto) {
     return this.variationService.findVariation(query.categoryId as Types.ObjectId)
   }
-
 }

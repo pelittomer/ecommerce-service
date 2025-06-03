@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { VariationService } from './variation.service';
+import { VariationService } from './service/variation.service';
 import { VariationController } from './variation.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Variation, VariationSchema } from './schemas/variation.schema';
-import { VariationOption, VariationOptionSchema } from './schemas/variation-option.schema';
-import { VariationRepository } from './variation.repository';
+import { Variation, VariationSchema } from './entities/variation.entity';
+import { VariationOption, VariationOptionSchema } from './entities/variation-option.entity';
+import { VariationRepository } from './repository/variation.repository';
 import { SharedUtilsModule } from 'src/common/utils/shared-utils.module';
 
 @Module({

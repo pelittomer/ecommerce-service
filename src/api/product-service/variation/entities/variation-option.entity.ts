@@ -1,8 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, Types } from "mongoose";
-import { Variation } from "./variation.schema";
-
-export type VariationOptionDocument = VariationOption & Document;
+import { Types } from "mongoose";
+import { Variation } from "./variation.entity";
 
 @Schema({ timestamps: true })
 export class VariationOption {
