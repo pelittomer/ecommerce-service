@@ -1,9 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, Types } from "mongoose";
+import { Types } from "mongoose";
 import { Product } from "src/api/product-service/product/schemas/product.schema";
 import { User } from "src/api/user-service/user/entities/user.entity";
-
-export type FavoriteDocument = Favorite & Document;
 
 @Schema({ timestamps: true })
 export class Favorite {

@@ -1,12 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Favorite, FavoriteDocument } from "./schemas/favorite.schema";
 import { Model, Types } from "mongoose";
 import { ProductRepository } from "src/api/product-service/product/product.repository";
 import { SharedUtilsService } from "src/common/utils/shared-utils.service";
+import { Favorite } from "../entities/favorite.entity";
+import { FavoriteDocument } from "../entities/types";
+import { FavoriteDeleteManyOptions, IFavoriteRepository } from "./favorite.repository.interface";
 
 @Injectable()
-export class FavoriteRepository {
+export class FavoriteRepository implements IFavoriteRepository {
     constructor(
         @InjectModel(Favorite.name) private favoriteModel: Model<Favorite>,
         private readonly productRepository: ProductRepository,
@@ -52,9 +54,10 @@ export class FavoriteRepository {
         return await this.favoriteModel.find(queryFields).select('product')
     }
 
-    async deleteMany(queryFields: Partial<Favorite>, productIds: Types.ObjectId[]): Promise<void> {
+    async deleteMany(params: FavoriteDeleteManyOptions): Promise<void> {
+        const { payload, productIds } = params
         await this.sharedUtilsService.executeTransaction(async (session) => {
-            await this.favoriteModel.deleteMany(queryFields, { session })
+            await this.favoriteModel.deleteMany(payload, { session })
             await this.productRepository.updateManyProductStatistic({ favorites: -1 }, productIds, session)
         })
     }
