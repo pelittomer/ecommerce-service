@@ -6,7 +6,7 @@ import { AppConfig } from './config/type';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthModule } from './api/user-service/auth/auth.module';
 import { UserModule } from './api/user-service/user/user.module';
-import { UserDetailsModule } from './api/profile-service/user-details/user-details.module';
+import { ProfileModule} from './api/profile-service/profile/profile.module';
 import { AddressModule } from './api/profile-service/address/address.module';
 import { FavoriteModule } from './api/profile-service/favorite/favorite.module';
 import { ProductModule } from './api/product-service/product/product.module';
@@ -68,7 +68,7 @@ import { APP_GUARD } from '@nestjs/core';
     ScheduleModule.forRoot(),
     AuthModule,
     UserModule,
-    UserDetailsModule,
+    ProfileModule,
     AddressModule,
     FavoriteModule,
     ProductModule,

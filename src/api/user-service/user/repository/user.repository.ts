@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { User } from "../entities/user.entity";
 import { Model } from "mongoose";
-import { UserDetailsRepository } from "src/api/profile-service/user-details/user-details.repository";
+import { ProfileRepository } from "src/api/profile-service/profile/repository/profile.repository";
 import { Role } from "src/common/types";
 import { SharedUtilsService } from "src/common/utils/shared-utils.service";
 import { CreateUserOptions, FindOneUserOptions, FindUserByIdOptions, FindUsersByOrQueryOptions, IUserRepository } from "./user.repository.interface";
@@ -13,7 +13,7 @@ import { USER_MESSAGE } from "../constants/user-messages";
 export class UserRepository implements IUserRepository {
     constructor(
         @InjectModel(User.name) private userModel: Model<User>,
-        private readonly userDetailsRepository: UserDetailsRepository,
+        private readonly profileRepository: ProfileRepository,
         private readonly sharedUtilsService: SharedUtilsService,
     ) { }
 
@@ -33,7 +33,7 @@ export class UserRepository implements IUserRepository {
                 { session }
             )
             if (roles === Role.Customer) {
-                await this.userDetailsRepository.create({ user: user._id }, session)
+                await this.profileRepository.create({ user: user._id, session })
             }
             createdUser = user
         })

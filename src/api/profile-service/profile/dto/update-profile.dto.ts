@@ -3,7 +3,7 @@ import { Transform } from "class-transformer";
 import { IsDate, IsEnum, IsOptional, IsString } from "class-validator";
 import { Gender } from "src/common/types";
 
-class UpdateUserDetailDto {
+class UpdateProfileDto {
     @ApiProperty({ description: "User's first name", example: 'John' })
     @IsOptional()
     @IsString()
@@ -27,6 +27,5 @@ class UpdateUserDetailDto {
     gender: Gender;
 }
 
-
-export class PartialUpdateUserDetailDto extends PartialType(UpdateUserDetailDto) { }
+export class PartialUpdateProfileDto extends PartialType(UpdateProfileDto) { }
 

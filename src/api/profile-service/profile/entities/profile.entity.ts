@@ -5,7 +5,7 @@ import { User } from "src/api/user-service/user/entities/user.entity";
 import { Gender } from "./types";
 
 @Schema({ timestamps: true })
-export class UserDetails {
+export class Profile {
     @Prop()
     first_name: string;
 
@@ -25,4 +25,4 @@ export class UserDetails {
     user: Types.ObjectId;
 }
 
-export const UserDetailsSchema = SchemaFactory.createForClass(UserDetails);
+export const ProfileSchema = SchemaFactory.createForClass(Profile);

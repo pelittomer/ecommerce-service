@@ -1,5 +1,5 @@
 import { Document } from "mongoose";
-import { UserDetails } from "./user-detail.entity";
+import { Profile } from "./profile.entity";
 
 export enum Gender {
     Male = "Male",
@@ -8,4 +8,4 @@ export enum Gender {
     PreferNotToSay = "PreferNotToSay"
 }
 
-export type UserDetailsDocument = UserDetails & Document;
+export type ProfileDocument = Profile & Document;
