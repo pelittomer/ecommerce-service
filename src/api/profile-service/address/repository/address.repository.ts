@@ -1,18 +1,23 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { ClientSession, Model, Types } from "mongoose";
-import { Address, AddressDocument } from "./schemas/address.schema";
-import { CreateAddressDto } from "./dto/create-address.dto";
+import { Address } from "../entities/address.entity";
 import { SharedUtilsService } from "src/common/utils/shared-utils.service";
+import { AddressDocument } from "../entities/types";
+import { AddressCreateOptions, AddressFindIsDefaultOptions, AddressFindOneAndDeleteOptions, AddressUpdateOptions, IAddressRepository } from "./address.repository.interface";
+import { ADDRESS_MESSAGE } from "../constants/address.message";
 
 @Injectable()
-export class AddressRepository {
+export class AddressRepository implements IAddressRepository {
     constructor(
         @InjectModel(Address.name) private addressModel: Model<Address>,
         private readonly sharedUtilsService: SharedUtilsService,
     ) { }
 
-    private async unsetExistingDefaultAddress(userId: Types.ObjectId, session: ClientSession): Promise<void> {
+    private async unsetExistingDefaultAddress(
+        userId: Types.ObjectId,
+        session: ClientSession
+    ): Promise<void> {
         await this.addressModel.updateMany(
             { user: userId, is_default: true },
             { is_default: false },
@@ -20,13 +25,14 @@ export class AddressRepository {
         );
     }
 
-    async create(address: CreateAddressDto, userId: Types.ObjectId): Promise<void> {
+    async create(params: AddressCreateOptions): Promise<void> {
+        const { payload, userId } = params
         await this.sharedUtilsService.executeTransaction(async (session) => {
             // Set all existing default addresses for the user to false.
             await this.unsetExistingDefaultAddress(userId, session)
             // Create the new address.
             await this.addressModel.create(
-                [{ ...address, user: userId }],
+                [{ ...payload, user: userId }],
                 { session },
             )
         })
@@ -36,7 +42,8 @@ export class AddressRepository {
         return await this.addressModel.find({ user: userId }).lean()
     }
 
-    async update(addressId: Types.ObjectId, userId: Types.ObjectId): Promise<void> {
+    async update(params: AddressUpdateOptions): Promise<void> {
+        const { userId, addressId } = params
         await this.sharedUtilsService.executeTransaction(async (session) => {
             // Set all existing default addresses for the user to false.
             await this.unsetExistingDefaultAddress(userId, session)
@@ -49,14 +56,15 @@ export class AddressRepository {
         })
     }
 
-    async delete(addressId: Types.ObjectId, userId: Types.ObjectId): Promise<void> {
+    async findOneAndDelete(params: AddressFindOneAndDeleteOptions): Promise<void> {
+        const { userId, addressId } = params
         await this.sharedUtilsService.executeTransaction(async (session) => {
             const deletedAddress = await this.addressModel.findOneAndDelete(
                 { _id: addressId, user: userId },
                 { session },
             )
             if (!deletedAddress) {
-                throw new NotFoundException('Address not found or user unauthorized.')
+                throw new NotFoundException(ADDRESS_MESSAGE.ADDRESS_NOT_FOUND_OR_UNAUTHORIZED)
             }
 
             if (deletedAddress.is_default) {
@@ -77,7 +85,9 @@ export class AddressRepository {
         })
     }
 
-    async findIsDefault(queryFields: Pick<Address, 'user' | 'is_default'>): Promise<Pick<AddressDocument, '_id'> | null> {
+    async findIsDefault(
+        queryFields: AddressFindIsDefaultOptions
+    ): Promise<Pick<AddressDocument, '_id'> | null> {
         return await this.addressModel.exists(queryFields)
     }
 }

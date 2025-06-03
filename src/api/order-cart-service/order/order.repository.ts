@@ -3,12 +3,12 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Order, OrderDocument } from "./schemas/order.schema";
 import { Model, Types } from "mongoose";
 import { OrderItem, OrderItemDocument } from "./schemas/order-item.schema";
-import { AddressDocument } from "src/api/profile-service/address/schemas/address.schema";
 import { OrderUtilsService } from "./utils/order-utils.service";
 import { ProductRepository } from "src/api/product-service/product/product.repository";
 import { CartRepository, PopulateCart } from "../cart/cart.repository";
 import { SharedUtilsService } from "src/common/utils/shared-utils.service";
 import { PaymentRepository } from "src/api/payment-transactions-service/payment/payment.repository";
+import { AddressDocument } from "src/api/profile-service/address/entities/types";
 
 @Injectable()
 export class OrderRepository {

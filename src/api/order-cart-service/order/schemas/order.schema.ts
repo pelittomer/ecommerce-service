@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Types } from "mongoose";
-import { Address } from "src/api/profile-service/address/schemas/address.schema";
+import { Address } from "src/api/profile-service/address/entities/address.entity";
 import { User } from "src/api/user-service/user/entities/user.entity";
 import { OrderStatus } from "src/common/types";
 

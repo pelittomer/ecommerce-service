@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
-import { AddressService } from './address.service';
+import { AddressService } from './service/address.service';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
@@ -17,10 +17,10 @@ export class AddressController {
   @Roles(Role.Customer)
   @Post()
   createAddress(
-    @Body() userInputs: CreateAddressDto,
+    @Body() payload: CreateAddressDto,
     @Req() req: Request
   ) {
-    return this.addressService.createAddress(userInputs, req)
+    return this.addressService.createAddress({ payload, req })
   }
 
   @UseGuards(AuthGuard, RolesGuard)
@@ -37,7 +37,7 @@ export class AddressController {
     @Req() req: Request,
     @Param('id', ParseObjectIdPipe) addressId: Types.ObjectId
   ) {
-    return this.addressService.updateAddressDefault(req, addressId)
+    return this.addressService.updateAddressDefault({ req, addressId })
   }
 
   @UseGuards(AuthGuard, RolesGuard)
@@ -47,7 +47,7 @@ export class AddressController {
     @Req() req: Request,
     @Param('id', ParseObjectIdPipe) addressId: Types.ObjectId
   ) {
-    return this.addressService.deleteAddress(req, addressId)
+    return this.addressService.deleteAddress({ req, addressId })
   }
 
 }

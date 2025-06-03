@@ -1,8 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, Types } from "mongoose";
+import { Types } from "mongoose";
 import { User } from "src/api/user-service/user/entities/user.entity";
-
-export type AddressDocument = Address & Document;
 
 @Schema({ timestamps: true })
 export class Address {

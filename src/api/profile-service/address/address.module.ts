@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { AddressService } from './address.service';
+import { AddressService } from './service/address.service';
 import { AddressController } from './address.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Address, AddressSchema } from './schemas/address.schema';
-import { AddressRepository } from './address.repository';
+import { Address, AddressSchema } from './entities/address.entity';
+import { AddressRepository } from './repository/address.repository';
 import { SharedUtilsModule } from 'src/common/utils/shared-utils.module';
 
 @Module({

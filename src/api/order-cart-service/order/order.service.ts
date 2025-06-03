@@ -4,7 +4,7 @@ import { OrderRepository } from './order.repository';
 import { SharedUtilsService } from 'src/common/utils/shared-utils.service';
 import { Types } from 'mongoose';
 import { CartRepository } from '../cart/cart.repository';
-import { AddressRepository } from 'src/api/profile-service/address/address.repository';
+import { AddressRepository } from 'src/api/profile-service/address/repository/address.repository';
 import { OrderUtilsService } from './utils/order-utils.service';
 import { Order } from './schemas/order.schema';
 import { OrderItem } from './schemas/order-item.schema';
