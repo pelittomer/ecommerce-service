@@ -1,49 +1,53 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { User, UserDocument } from "./schemas/user.schema";
-import { Model, Types } from "mongoose";
+import { User } from "../entities/user.entity";
+import { Model } from "mongoose";
 import { UserDetailsRepository } from "src/api/profile-service/user-details/user-details.repository";
 import { Role } from "src/common/types";
 import { SharedUtilsService } from "src/common/utils/shared-utils.service";
+import { CreateUserOptions, FindOneUserOptions, FindUserByIdOptions, FindUsersByOrQueryOptions, IUserRepository } from "./user.repository.interface";
+import { UserDocument } from "../entities/types";
+import { USER_MESSAGE } from "../constants/user-messages";
 
 @Injectable()
-export class UserRepository {
+export class UserRepository implements IUserRepository {
     constructor(
         @InjectModel(User.name) private userModel: Model<User>,
         private readonly userDetailsRepository: UserDetailsRepository,
         private readonly sharedUtilsService: SharedUtilsService,
     ) { }
 
-    async findByOrQuery(queryFields: Partial<Record<keyof User, any>>): Promise<UserDocument | null> {
+    async findByOrQuery(queryFields: FindUsersByOrQueryOptions): Promise<UserDocument | null> {
         const orConditions = Object.keys(queryFields).map(key => ({
             [key]: queryFields[key]
         }))
         return await this.userModel.findOne({ $or: orConditions })
     }
 
-    async create(userInputs: Partial<User>, role: Exclude<Role, Role.Admin>): Promise<UserDocument> {
+    async create(payload: CreateUserOptions): Promise<UserDocument> {
+        const { roles } = payload
         let createdUser: UserDocument | null = null
         await this.sharedUtilsService.executeTransaction(async (session) => {
             const [user] = await this.userModel.create(
-                [{ ...userInputs, roles: role }],
+                [{ ...payload }],
                 { session }
             )
-            if (role === Role.Customer) {
+            if (roles === Role.Customer) {
                 await this.userDetailsRepository.create({ user: user._id }, session)
             }
             createdUser = user
         })
         if (!createdUser) {
-            throw new Error('Failed to create user.')
+            throw new Error(USER_MESSAGE.FAILED_TO_CREATE_USER)
         }
         return createdUser as UserDocument
     }
 
-    async findOne(query: Partial<User>): Promise<UserDocument | null> {
-        return await this.userModel.findOne(query)
+    async findOne(queryFields: FindOneUserOptions): Promise<UserDocument | null> {
+        return await this.userModel.findOne(queryFields)
     }
 
-    async findById(userId: Types.ObjectId): Promise<UserDocument | null> {
-        return await this.userModel.findById(userId)
+    async findById(queryFields: FindUserByIdOptions): Promise<UserDocument | null> {
+        return await this.userModel.findById(queryFields.userId)
     }
 }

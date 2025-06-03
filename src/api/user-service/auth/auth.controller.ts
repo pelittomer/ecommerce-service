@@ -1,30 +1,29 @@
 import { Body, Controller, Get, Post, Req, Res, UseFilters, UseGuards } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { AuthService } from './service/auth.service';
 import { AuthGuard } from 'src/common/guards/auth.guard';
-import { RoleParam } from './lib/role-validation.pipe';
+import { RoleParam } from './lib/pipe/role-validation.pipe';
 import { UserRole } from './types';
-import { Role } from 'src/common/types';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { Request, Response } from 'express';
 import { hours, minutes, seconds, Throttle } from '@nestjs/throttler';
-import { SignInRateLimitExceptionFilter } from './utils/signInExceptionFilter';
+import { SignInRateLimitExceptionFilter } from './lib/filter/signInExceptionFilter';
+import { AuthUtils } from './utils/auth.utils';
 
 @Controller('user/auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
-
-  private mapRoleParamToEnum(roleParam: UserRole): Exclude<Role, Role.Admin> {
-    return roleParam === 'customer' ? Role.Customer : Role.Seller;
-  }
+  constructor(
+    private readonly authService: AuthService,
+    private readonly authUtils: AuthUtils,
+  ) { }
 
   @Post(':role/sign-up')
   signUp(
     @Body() userInputs: RegisterDto,
     @RoleParam() roleParam: UserRole
   ) {
-    const role = this.mapRoleParamToEnum(roleParam)
-    return this.authService.register(userInputs, role)
+    const roles = this.authUtils.mapRoleParamToEnum(roleParam)
+    return this.authService.register({ ...userInputs, roles })
   }
 
   @UseFilters(SignInRateLimitExceptionFilter)
@@ -39,8 +38,8 @@ export class AuthController {
     @RoleParam() roleParam: UserRole,
     @Res({ passthrough: true }) res: Response
   ) {
-    const role = this.mapRoleParamToEnum(roleParam)
-    return this.authService.login(userInputs, role, res)
+    const roles = this.authUtils.mapRoleParamToEnum(roleParam)
+    return this.authService.login({ ...userInputs, roles, res })
   }
 
   @UseGuards(AuthGuard)
@@ -49,15 +48,11 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response
   ) {
-    return this.authService.logout(req, res)
+    return this.authService.logout({ req, res })
   }
 
   @Get('refresh')
-  refresh(
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response
-  ) {
-    return this.authService.refresh(req, res)
+  refresh(@Req() req: Request) {
+    return this.authService.refresh({ req })
   }
-
 }

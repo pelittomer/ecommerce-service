@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { UserDetails, UserDetailsDocument } from "./schemas/user-detail.schema";
+import { UserDetails } from "./entities/user-detail.entity";
 import { ClientSession, Model, Types } from "mongoose";
 import { UploadService } from "src/api/upload-service/upload/upload.service";
 import { SharedUtilsService } from "src/common/utils/shared-utils.service";
+import { UserDetailsDocument } from "./entities/types";
 
 @Injectable()
 export class UserDetailsRepository {

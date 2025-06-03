@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Types } from "mongoose";
 import { ProductStock } from "src/api/product-service/product/schemas/product-stock.schema";
 import { Product } from "src/api/product-service/product/schemas/product.schema";
-import { User } from "src/api/user-service/user/schemas/user.schema";
+import { User } from "src/api/user-service/user/entities/user.entity";
 
 export type CartDocument = Cart & Document;
 

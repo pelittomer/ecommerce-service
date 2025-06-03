@@ -4,7 +4,7 @@ import { ProductStock } from "src/api/product-service/product/schemas/product-st
 import { Product } from "src/api/product-service/product/schemas/product.schema";
 import { OrderStatus } from "src/common/types";
 import { Order } from "./order.schema";
-import { User } from "src/api/user-service/user/schemas/user.schema";
+import { User } from "src/api/user-service/user/entities/user.entity";
 
 export type OrderItemDocument = OrderItem & Document;
 

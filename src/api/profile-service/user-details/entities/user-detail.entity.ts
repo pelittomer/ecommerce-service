@@ -1,10 +1,8 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, Types } from "mongoose";
+import { Types } from "mongoose";
 import { Upload } from "src/api/upload-service/upload/schemas/upload.schema";
-import { User } from "src/api/user-service/user/schemas/user.schema";
-import { Gender } from "src/common/types";
-
-export type UserDetailsDocument = UserDetails & Document;
+import { User } from "src/api/user-service/user/entities/user.entity";
+import { Gender } from "./types";
 
 @Schema({ timestamps: true })
 export class UserDetails {

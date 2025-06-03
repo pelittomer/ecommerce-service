@@ -4,7 +4,7 @@ import { Request } from 'express';
 import { UserDetailsRepository } from './user-details.repository';
 import { SharedUtilsService } from 'src/common/utils/shared-utils.service';
 import { Types } from 'mongoose';
-import { UserDetailsDocument } from './schemas/user-detail.schema';
+import { UserDetailsDocument } from './entities/types';
 
 @Injectable()
 export class UserDetailsService {

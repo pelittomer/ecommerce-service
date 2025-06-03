@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { UserService } from './user.service';
+import { UserService } from './service/user.service';
 import { UserController } from './user.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from './schemas/user.schema';
-import { UserRepository } from './user.repository';
+import { User, UserSchema } from './entities/user.entity';
+import { UserRepository } from './repository/user.repository';
 import { UserDetailsModule } from 'src/api/profile-service/user-details/user-details.module';
 import { SharedUtilsModule } from 'src/common/utils/shared-utils.module';
 

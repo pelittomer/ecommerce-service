@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Types } from "mongoose";
 import { Address } from "src/api/profile-service/address/schemas/address.schema";
-import { User } from "src/api/user-service/user/schemas/user.schema";
+import { User } from "src/api/user-service/user/entities/user.entity";
 import { OrderStatus } from "src/common/types";
 
 export type OrderDocument = Order & Document;

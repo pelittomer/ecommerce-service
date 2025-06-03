@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document, Types } from 'mongoose'
 import { Order } from 'src/api/order-cart-service/order/schemas/order.schema';
-import { User } from 'src/api/user-service/user/schemas/user.schema';
+import { User } from 'src/api/user-service/user/entities/user.entity';
 import { PaymentMethod, PaymentStatus } from 'src/common/types';
 
 interface CardDetails {
