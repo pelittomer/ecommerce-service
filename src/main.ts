@@ -9,6 +9,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { ConfigService } from '@nestjs/config';
 import { LogModel } from './common/logging/logger.model';
 import { CustomLoggerService } from './common/logging/logger.service';
+import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 
 
 function setupSwagger(app) {
@@ -49,6 +50,7 @@ async function bootstrap() {
     })
   )
 
+  app.useGlobalInterceptors(new TransformInterceptor())
   app.useGlobalFilters(new HttpExceptionFilter())
 
   const port = app.get(ConfigService<AppConfig, true>).get('api.port', { infer: true })

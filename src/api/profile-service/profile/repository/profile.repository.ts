@@ -18,7 +18,7 @@ export class ProfileRepository implements IProfileRepository {
 
     async create(params: CreateProfileOptions): Promise<void> {
         const { user, session } = params
-        await this.userDetailsModel.create([user], { session })
+        await this.userDetailsModel.create([{ user }], { session })
     }
 
     async findOne(queryFieds: Partial<Profile>): Promise<ProfileDocument | null> {

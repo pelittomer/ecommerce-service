@@ -6,7 +6,7 @@ import { AppConfig } from './config/type';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthModule } from './api/user-service/auth/auth.module';
 import { UserModule } from './api/user-service/user/user.module';
-import { ProfileModule} from './api/profile-service/profile/profile.module';
+import { ProfileModule } from './api/profile-service/profile/profile.module';
 import { AddressModule } from './api/profile-service/address/address.module';
 import { FavoriteModule } from './api/profile-service/favorite/favorite.module';
 import { ProductModule } from './api/product-service/product/product.module';
@@ -25,7 +25,8 @@ import { ShipperModule } from './api/payment-transactions-service/shipper/shippe
 import { ScheduleModule } from '@nestjs/schedule';
 import { LoggerModule } from './common/logging/logger.module';
 import { minutes, seconds, ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 
 @Module({
   imports: [
@@ -90,7 +91,11 @@ import { APP_GUARD } from '@nestjs/core';
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard
-    }
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TransformInterceptor,
+    },
   ],
 })
 export class AppModule { }
