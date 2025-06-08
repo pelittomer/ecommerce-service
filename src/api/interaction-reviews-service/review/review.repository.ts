@@ -4,7 +4,7 @@ import { Review } from "./schemas/review.schema";
 import { Model, Types } from "mongoose";
 import { SharedUtilsService } from "src/common/utils/shared-utils.service";
 import { UploadService } from "src/api/upload-service/upload/upload.service";
-import { ProductRepository } from "src/api/product-service/product/product.repository";
+import { ProductRepository } from "src/api/product-service/product/repository/product.repository";
 import { CreateReviewDto } from "./dto/create-review.dto";
 import { GetReviewDto } from "./dto/get-review.dto";
 
@@ -28,11 +28,14 @@ export class ReviewRepository {
             ], { session })
 
             await this.productRepository.findOneAndUpdateStatistic({
-                ratings: {
-                    count: 1,
-                    average: userInputs.rate
-                }
-            }, userInputs.product, session)
+                query: {
+                    ratings: {
+                        count: 1,
+                        average: userInputs.rate
+                    }
+                },
+                productId: userInputs.product, session
+            })
         })
     }
 

@@ -1,13 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, Types } from "mongoose";
-import { Product } from "./product.schema";
-
-interface Ratings {
-    count: number;
-    average: number;
-}
-
-export type ProductStatisticDocument = ProductStatistic & Document;
+import { Types } from "mongoose";
+import { Product } from "./product.entity";
+import { Ratings } from "./types";
 
 @Schema({ timestamps: true })
 export class ProductStatistic {

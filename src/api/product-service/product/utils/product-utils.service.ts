@@ -1,35 +1,33 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
-import { ClientSession, Types } from "mongoose";
+import { Types } from "mongoose";
 import { CompanyRepository } from "src/api/company-service/company/company.repository";
 import { UploadService } from "src/api/upload-service/upload/upload.service";
 import { CompanyStatus } from "src/common/types";
 import { UpdateProductDto } from "../dto/update-product.dto";
-import { CreateProductDto } from "../dto/create-product.dto";
-import { ProductDocument } from "../schemas/product.schema";
-import { ProductDetailDocument } from "../schemas/product-details.schema";
+import { GetDeleteImageIdsParams, IProductUtilsService, ProcessCriteriaImagesParams, SaveUploadedImagesParams, ValidateAndGroupUploadedFilesParams } from "./product-utils.service.interface";
+import { CompanyDocument } from "src/api/company-service/company/schemas/company.schema";
+import { PRODUCT_MESSAGE } from "../constants/product.message";
 
 @Injectable()
-export class ProductUtilsService {
+export class ProductUtilsService implements IProductUtilsService {
     constructor(
         private readonly uploadService: UploadService,
         private readonly companyRepository: CompanyRepository,
     ) { }
 
-    validateAndGroupUploadedFiles(
-        files: Express.Multer.File[],
-        requireFiles: boolean = false
-    ): Record<string, Express.Multer.File[]> {
+    validateAndGroupUploadedFiles(params: ValidateAndGroupUploadedFilesParams): Record<string, Express.Multer.File[]> {
+        const { files, requireFiles } = params
         if (requireFiles && (!files?.length)) {
-            throw new BadRequestException('Image upload failed. Please select at least one image.')
+            throw new BadRequestException(PRODUCT_MESSAGE.IMAGE_UPLOAD_FAILED_NO_IMAGE)
         }
 
         return files.reduce((uploadedFiles: Record<string, Express.Multer.File[]>, file) => {
             if (!file.mimetype.startsWith('image/')) {
-                throw new BadRequestException('Only image files are allowed!')
+                throw new BadRequestException(PRODUCT_MESSAGE.IMAGE_UPLOAD_ONLY_IMAGES_ALLOWED)
             }
 
             if (file.size > 5 * 1024 * 1024) {
-                throw new BadRequestException(`The file '${file.originalname}' is too large. Maximum file size is 5MB.`)
+                throw new BadRequestException(PRODUCT_MESSAGE.IMAGE_UPLOAD_FILE_TOO_LARGE(file.originalname))
             }
 
             (uploadedFiles[file.fieldname] ||= []).push(file)
@@ -37,18 +35,19 @@ export class ProductUtilsService {
         }, {})
     }
 
-    async validateUserCompany(userId: Types.ObjectId) {
+    async validateUserCompany(userId: Types.ObjectId): Promise<CompanyDocument> {
         const company = await this.companyRepository.findOne({ user: new Types.ObjectId(userId) })
         if (!company) {
-            throw new NotFoundException('You have not created a company yet.')
+            throw new NotFoundException(PRODUCT_MESSAGE.COMPANY_NOT_CREATED)
         }
         if (company.status !== CompanyStatus.Approved) {
-            throw new BadRequestException('Your company status is not approved. You cannot create products.')
+            throw new BadRequestException(PRODUCT_MESSAGE.COMPANY_NOT_APPROVED)
         }
         return company
     }
 
-    processCriteriaImages(criteria: UpdateProductDto['criteria'] | CreateProductDto['criteria'], images: Record<string, Types.ObjectId[]>): UpdateProductDto['criteria'] {
+    processCriteriaImages(params: ProcessCriteriaImagesParams): UpdateProductDto['criteria'] {
+        const { criteria, images } = params
         return criteria?.map((criterion) => ({
             ...criterion,
             options: criterion.options.map((option) => ({
@@ -58,10 +57,8 @@ export class ProductUtilsService {
         }))
     }
 
-    async saveUploadedImages(
-        uploadedFiles: Record<string, Express.Multer.File[]>,
-        session: ClientSession
-    ): Promise<Record<string, Types.ObjectId[]>> {
+    async saveUploadedImages(params: SaveUploadedImagesParams): Promise<Record<string, Types.ObjectId[]>> {
+        const { session, uploadedFiles } = params
         const images = await Promise.all(
             Object.entries(uploadedFiles).map(async ([uploadKey, files]) => {
                 const savedImageIds = await Promise.all(
@@ -73,18 +70,16 @@ export class ProductUtilsService {
         return Object.fromEntries(images)
     }
 
-    getDeleteImageIds(
-        products: ProductDocument,
-        productDetails: ProductDetailDocument,
-        userInputs: UpdateProductDto): Types.ObjectId[] {
+    getDeleteImageIds(params: GetDeleteImageIdsParams): Types.ObjectId[] {
+        const { productDetails, products, payload } = params
         const deleteImageIds: Types.ObjectId[] = [];
-        const inputsImageIds = userInputs.images?.map((img) => img._id);
+        const inputsImageIds = payload.images?.map((img) => img._id);
         deleteImageIds.push(
             ...products.images.filter((img) => !inputsImageIds?.includes(img._id))
                 .map((img) => img._id)
         )
 
-        const userCriteriaImageIds = userInputs.criteria?.flatMap((criteria) => criteria.options.flatMap((option) => option.images || []))
+        const userCriteriaImageIds = payload.criteria?.flatMap((criteria) => criteria.options.flatMap((option) => option.images || []))
 
         productDetails.criteria.forEach((criteria) => {
             criteria.options.forEach((option) => {

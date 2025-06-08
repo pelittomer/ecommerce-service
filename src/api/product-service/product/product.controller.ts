@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post, Put, Query, Req, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
-import { ProductService } from './product.service';
+import { ProductService } from './service/product.service';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Role } from 'src/common/types';
@@ -25,12 +25,12 @@ export class ProductController {
   @Post()
   @UseInterceptors(AnyFilesInterceptor())
   createProduct(
-    @Body() userInputs: CreateProductDto,
+    @Body() payload: CreateProductDto,
     @Req() req: Request,
     @UploadedFiles() files: Express.Multer.File[]
   ) {
-    const groupedFiles = this.productUtilsService.validateAndGroupUploadedFiles(files, true)
-    return this.productService.createProduct(userInputs, req, groupedFiles)
+    const uploadedFiles = this.productUtilsService.validateAndGroupUploadedFiles({ files, requireFiles: true })
+    return this.productService.createProduct({ payload, req, uploadedFiles })
   }
 
   @UseGuards(AuthGuard, RolesGuard)
@@ -38,13 +38,13 @@ export class ProductController {
   @Put(':id')
   @UseInterceptors(AnyFilesInterceptor())
   updateProduct(
-    @Body() userInputs: UpdateProductDto,
+    @Body() payload: UpdateProductDto,
     @Req() req: Request,
     @UploadedFiles() files: Express.Multer.File[],
     @Param('id', ParseObjectIdPipe) productId: Types.ObjectId
   ) {
-    const groupedFiles = this.productUtilsService.validateAndGroupUploadedFiles(files)
-    return this.productService.updateProduct(userInputs, req, groupedFiles, productId)
+    const uploadedFiles = this.productUtilsService.validateAndGroupUploadedFiles({ files, requireFiles: false })
+    return this.productService.updateProduct({ payload, req, uploadedFiles, productId })
   }
 
   @Get(':id')
@@ -56,5 +56,4 @@ export class ProductController {
   fetchProduct(@Query() query: PartialGetProductDto) {
     return this.productService.findProducts(query)
   }
-
 }

@@ -1,19 +1,11 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, Types } from "mongoose";
+import { Types } from "mongoose";
 import { Upload } from "src/api/upload-service/upload/schemas/upload.schema";
 import { Brand } from "../../brand/schemas/brand.schema";
 import { Company } from "src/api/company-service/company/schemas/company.schema";
 import { Shipper } from "src/api/payment-transactions-service/shipper/schemas/shipper.schema";
 import { Category } from "../../category/schemas/category.schema";
-
-interface Discount {
-    discount_percentage?: number;
-    start_date?: Date;
-    end_date: Date;
-    applied_price?: number;
-}
-
-export type ProductDocument = Product & Document;
+import { Discount } from "./types";
 
 @Schema({ timestamps: true })
 export class Product {

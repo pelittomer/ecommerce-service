@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
-import { ProductRepository } from "src/api/product-service/product/product.repository";
+import { ProductRepository } from "src/api/product-service/product/repository/product.repository";
 import { SharedUtilsService } from "src/common/utils/shared-utils.service";
 import { Favorite } from "../entities/favorite.entity";
 import { FavoriteDocument } from "../entities/types";
@@ -22,7 +22,10 @@ export class FavoriteRepository implements IFavoriteRepository {
     async create(userInputs: Favorite): Promise<void> {
         await this.sharedUtilsService.executeTransaction(async (session) => {
             await this.favoriteModel.create([userInputs], { session })
-            await this.productRepository.findOneAndUpdateStatistic({ favorites: 1 }, userInputs.product, session)
+            await this.productRepository.findOneAndUpdateStatistic({
+                query: { favorites: 1 },
+                productId: userInputs.product, session
+            })
         })
     }
 
@@ -33,7 +36,10 @@ export class FavoriteRepository implements IFavoriteRepository {
     async findByIdAndDelete(favorite: FavoriteDocument): Promise<void> {
         await this.sharedUtilsService.executeTransaction(async (session) => {
             await this.favoriteModel.findByIdAndDelete(favorite._id, { session })
-            await this.productRepository.findOneAndUpdateStatistic({ favorites: -1 }, favorite.product, session)
+            await this.productRepository.findOneAndUpdateStatistic({
+                query: { favorites: -1 },
+                productId: favorite.product, session
+            })
         })
     }
 
@@ -58,7 +64,10 @@ export class FavoriteRepository implements IFavoriteRepository {
         const { payload, productIds } = params
         await this.sharedUtilsService.executeTransaction(async (session) => {
             await this.favoriteModel.deleteMany(payload, { session })
-            await this.productRepository.updateManyProductStatistic({ favorites: -1 }, productIds, session)
+            await this.productRepository.updateManyProductStatistic({
+                query: { favorites: -1 },
+                productIds, session
+            })
         })
     }
 }

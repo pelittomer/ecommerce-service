@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Types } from 'mongoose';
 import { Company } from 'src/api/company-service/company/schemas/company.schema';
-import { Product } from 'src/api/product-service/product/schemas/product.schema';
+import { Product } from 'src/api/product-service/product/entities/product.entity';
 import { User } from 'src/api/user-service/user/entities/user.entity';
 
 export type QuestionDocument = Question & Document;

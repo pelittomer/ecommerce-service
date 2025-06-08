@@ -1,15 +1,9 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, Types } from "mongoose";
-import { Product } from "./product.schema";
+import { Types } from "mongoose";
+import { Product } from "./product.entity";
 import { Variation } from "../../variation/entities/variation.entity";
 import { VariationOption } from "../../variation/entities/variation-option.entity";
-
-interface VariationItem {
-    variation: Types.ObjectId;
-    options: Types.ObjectId;
-}
-
-export type ProductStockDocument = ProductStock & Document;
+import { VariationItem } from "./types";
 
 @Schema({ timestamps: true })
 export class ProductStock {

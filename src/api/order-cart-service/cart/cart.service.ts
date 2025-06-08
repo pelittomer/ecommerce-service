@@ -4,7 +4,7 @@ import { CreateCartDto } from './dto/create-cart.dto';
 import { Request } from 'express';
 import { SharedUtilsService } from 'src/common/utils/shared-utils.service';
 import { Types } from 'mongoose';
-import { ProductRepository } from 'src/api/product-service/product/product.repository';
+import { ProductRepository } from 'src/api/product-service/product/repository/product.repository';
 import { Cart } from './schemas/cart.schema';
 import { UpdateCartDto } from './dto/update-cart.dto';
 

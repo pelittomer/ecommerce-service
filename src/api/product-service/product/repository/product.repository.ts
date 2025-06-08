@@ -1,18 +1,19 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Product, ProductDocument } from "./schemas/product.schema";
-import { ProductDetail, ProductDetailDocument } from "./schemas/product-details.schema";
-import { ProductStock } from "./schemas/product-stock.schema";
-import { ProductStatistic } from "./schemas/product-statistic.schema";
-import { ClientSession, Model, Types } from "mongoose";
-import { CreateProductDto } from "./dto/create-product.dto";
+import { Product } from "../entities/product.entity";
+import { ProductDetail } from "../entities/product-details.entity";
+import { ProductStock } from "../entities/product-stock.entity";
+import { ProductStatistic } from "../entities/product-statistic.entity";
+import { Model, Types } from "mongoose";
 import { SharedUtilsService } from "src/common/utils/shared-utils.service";
-import { ProductUtilsService } from "./utils/product-utils.service";
+import { ProductUtilsService } from "../utils/product-utils.service";
 import { UploadRepository } from "src/api/upload-service/upload/upload.repository";
-import { UpdateProductDto } from "./dto/update-product.dto";
+import { BulkUpdateStocksOptions, CreateProductOptions, FindOneAndUpdateStatisticOptions, FindProductAndDetailsOptions, FindProductExistsOptions, FindProductOptions, IProductRepository, TFindProduct, TFindProductAndDetails, TFindProductExists, TProductFindOne, UpdateManyProductStatisticOptions, UpdateProductOptions } from "./product.repository.interface";
+import { BulkWriteResult } from 'mongodb';
+import { ProductDocument } from "../entities/types";
 
 @Injectable()
-export class ProductRepository {
+export class ProductRepository implements IProductRepository {
     constructor(
         @InjectModel(Product.name) private productModel: Model<Product>,
         @InjectModel(ProductDetail.name) private productDetailModel: Model<ProductDetail>,
@@ -23,21 +24,18 @@ export class ProductRepository {
         private readonly uploadRepository: UploadRepository,
     ) { }
 
-    async create(
-        userInputs: CreateProductDto,
-        uploadedFiles: Record<string, Express.Multer.File[]>,
-        companyId: Types.ObjectId
-    ) {
+    async create(params: CreateProductOptions): Promise<void> {
+        const { payload, uploadedFiles, companyId } = params
         const {
             //product data
             name, price, brand, shipper, category,
             //product details data
             description, short_description, features, criteria
-        } = userInputs
+        } = payload
 
         await this.sharedUtilsService.executeTransaction(async (session) => {
-            const images = await this.productUtilsService.saveUploadedImages(uploadedFiles, session)
-            const processedCriteria = this.productUtilsService.processCriteriaImages(criteria, images)
+            const images = await this.productUtilsService.saveUploadedImages({ uploadedFiles, session })
+            const processedCriteria = this.productUtilsService.processCriteriaImages({ criteria, images })
 
             const [product] = await this.productModel.create([{
                 name, price,
@@ -57,7 +55,7 @@ export class ProductRepository {
                     }
                 ], { session })
             //stock-data
-            const stockData = userInputs.stock.map((item) => ({
+            const stockData = payload.stock.map((item) => ({
                 ...item,
                 product: product._id
             }))
@@ -71,7 +69,8 @@ export class ProductRepository {
         })
     }
 
-    async findProductAndDetails(productId: Types.ObjectId, companyId: Types.ObjectId) {
+    async findProductAndDetails(params: FindProductAndDetailsOptions): Promise<TFindProductAndDetails> {
+        const { companyId, productId } = params
         const [product, productDetails] = await Promise.all([
             this.productModel.findOne({ company: companyId, _id: productId }),
             this.productDetailModel.findOne({ product: productId })
@@ -79,41 +78,36 @@ export class ProductRepository {
         return { product, productDetails }
     }
 
-    async update(
-        product: ProductDocument,
-        productDetails: ProductDetailDocument,
-        uploadedFiles: Record<string, Express.Multer.File[]>,
-        userInputs: UpdateProductDto,
-        productId: Types.ObjectId
-    ) {
+    async update(params: UpdateProductOptions): Promise<void> {
+        const { product, productDetails, uploadedFiles, payload, productId } = params
         await this.sharedUtilsService.executeTransaction(async (session) => {
-            const deleteImageIds = this.productUtilsService.getDeleteImageIds(product, productDetails, userInputs)
+            const deleteImageIds = this.productUtilsService.getDeleteImageIds({ products: product, productDetails, payload })
             await this.uploadRepository.deleteMany(deleteImageIds, session)
 
-            const images = await this.productUtilsService.saveUploadedImages(uploadedFiles, session)
-            userInputs.criteria = this.productUtilsService.processCriteriaImages(userInputs.criteria, images)
-            if (images.images) userInputs.images?.push(...images.images)
+            const images = await this.productUtilsService.saveUploadedImages({ uploadedFiles, session })
+            payload.criteria = this.productUtilsService.processCriteriaImages({ criteria: payload.criteria, images })
+            if (images.images) payload.images?.push(...images.images)
 
             const productPromise = this.productModel.findOneAndUpdate(
                 { _id: productId },
                 {
-                    price: userInputs.price,
-                    discount: userInputs.discount,
-                    is_published: userInputs.is_published,
-                    images: userInputs.images,
-                    shipper: userInputs.shipper,
+                    price: payload.price,
+                    discount: payload.discount,
+                    is_published: payload.is_published,
+                    images: payload.images,
+                    shipper: payload.shipper,
                 }, { session })
 
             const productDetailsPromise = this.productDetailModel.findOneAndUpdate(
                 { product: productId },
                 {
-                    description: userInputs.description,
-                    short_description: userInputs.short_description,
-                    features: userInputs.features,
-                    criteria: userInputs.criteria,
+                    description: payload.description,
+                    short_description: payload.short_description,
+                    features: payload.features,
+                    criteria: payload.criteria,
                 }, { session })
 
-            const stockPromise = userInputs.stock?.map((stockItem) => {
+            const stockPromise = payload.stock?.map((stockItem) => {
                 const { _id, ...updateData } = stockItem;
                 const update = { ...updateData, product: productId };
                 const query = _id ? { _id, product: productId } : { product: productId };
@@ -126,7 +120,7 @@ export class ProductRepository {
         })
     }
 
-    async findOne(productId: Types.ObjectId) {
+    async findOne(productId: Types.ObjectId): Promise<TProductFindOne> {
         const [products, productDetails, productStatistics, productStocks] = await Promise.all([
             this.productModel.findOne({ _id: productId })
                 .populate('brand')
@@ -141,7 +135,10 @@ export class ProductRepository {
 
             this.productStatisticModel.findOne({ product: productId }).lean(),
             this.productStockModel.find({ product: productId }).lean(),
-            this.findOneAndUpdateStatistic({ views: 1 }, productId)
+            this.findOneAndUpdateStatistic({
+                query: { views: 1 },
+                productId
+            })
         ])
 
         return {
@@ -152,7 +149,8 @@ export class ProductRepository {
         }
     }
 
-    async find(limit: number, startIndex: number, filter, sortCriteria) {
+    async find(params: FindProductOptions): Promise<TFindProduct> {
+        const { limit, startIndex, filter, sortCriteria } = params
         const [productsLength, products] = await Promise.all([
             this.productModel.countDocuments(filter),
             this.productModel.aggregate([
@@ -222,15 +220,12 @@ export class ProductRepository {
         return { productsLength, products }
     }
 
-    async findProductExists(queryFieds: Partial<Product | Pick<ProductDocument, '_id'>>): Promise<Pick<ProductDocument, '_id'> | null> {
-        return await this.productModel.exists(queryFieds)
+    async findProductExists(queryFields: FindProductExistsOptions): Promise<TFindProductExists> {
+        return await this.productModel.exists(queryFields)
     }
 
-
-    async findOneAndUpdateStatistic(
-        query: Partial<ProductStatistic>,
-        productId: Types.ObjectId,
-        session?: ClientSession) {
+    async findOneAndUpdateStatistic(params: FindOneAndUpdateStatisticOptions): Promise<void> {
+        const { query, productId, session } = params
         const objectProductId = new Types.ObjectId(productId)
         if (query.ratings) {
             const { average: rate } = query.ratings
@@ -266,10 +261,8 @@ export class ProductRepository {
         }
     }
 
-    async updateManyProductStatistic(
-        query: Partial<ProductStatistic>,
-        productIds: Types.ObjectId[],
-        session: ClientSession): Promise<void> {
+    async updateManyProductStatistic(params: UpdateManyProductStatisticOptions): Promise<void> {
+        const { query, productIds, session } = params
         await this.productStatisticModel.updateMany(
             { product: { $in: productIds } },
             { $inc: query },
@@ -277,15 +270,16 @@ export class ProductRepository {
         )
     }
 
-    async findStockItemById(statisticId: Types.ObjectId): Promise<ProductStock | null> {
-        return await this.productStockModel.findById(statisticId)
+    async findStockItemById(stockId: Types.ObjectId): Promise<ProductStock | null> {
+        return await this.productStockModel.findById(stockId)
     }
 
-    async findById(productId): Promise<ProductDocument | null> {
+    async findById(productId: Types.ObjectId): Promise<ProductDocument | null> {
         return this.productModel.findById(productId)
     }
 
-    async bulkUpdateStocks(queryFields: any, session: ClientSession) {
+    async bulkUpdateStocks(params: BulkUpdateStocksOptions): Promise<BulkWriteResult> {
+        const { queryFields, session } = params
         return await this.productStockModel.bulkWrite(queryFields, { session })
     }
 }

@@ -4,7 +4,7 @@ import { Order, OrderDocument } from "./schemas/order.schema";
 import { Model, Types } from "mongoose";
 import { OrderItem, OrderItemDocument } from "./schemas/order-item.schema";
 import { OrderUtilsService } from "./utils/order-utils.service";
-import { ProductRepository } from "src/api/product-service/product/product.repository";
+import { ProductRepository } from "src/api/product-service/product/repository/product.repository";
 import { CartRepository, PopulateCart } from "../cart/cart.repository";
 import { SharedUtilsService } from "src/common/utils/shared-utils.service";
 import { PaymentRepository } from "src/api/payment-transactions-service/payment/payment.repository";
@@ -61,11 +61,11 @@ export class OrderRepository {
 
             //send to queue
             const productIds = carts.map((item) => item.product._id as Types.ObjectId)
-            await this.productRepository.updateManyProductStatistic(
-                { purchases: 1, carts: -1 },
+            await this.productRepository.updateManyProductStatistic({
+                query: { purchases: 1, carts: -1 },
                 productIds,
                 session
-            )
+            })
 
             // Update product stock quantities
             const productStockUpdates = carts.map((item) => {
@@ -89,7 +89,9 @@ export class OrderRepository {
                 }
             })
 
-            const updatedStocksResult = await this.productRepository.bulkUpdateStocks(productStockUpdates, session)
+            const updatedStocksResult = await this.productRepository.bulkUpdateStocks({
+                queryFields: productStockUpdates, session
+            })
             const updatedStockCount = updatedStocksResult?.modifiedCount || 0;
 
             // Update cart items if stock quantity is insufficient

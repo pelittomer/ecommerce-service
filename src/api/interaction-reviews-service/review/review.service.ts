@@ -3,7 +3,7 @@ import { CreateReviewDto } from './dto/create-review.dto';
 import { Request } from 'express';
 import { ReviewRepository } from './review.repository';
 import { SharedUtilsService } from 'src/common/utils/shared-utils.service';
-import { ProductRepository } from 'src/api/product-service/product/product.repository';
+import { ProductRepository } from 'src/api/product-service/product/repository/product.repository';
 import { Types } from 'mongoose';
 import { OrderRepository } from 'src/api/order-cart-service/order/order.repository';
 import { GetReviewDto } from './dto/get-review.dto';

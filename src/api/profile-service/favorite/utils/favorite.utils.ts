@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { FavoriteRepository } from "../repository/favorite.repository";
-import { ProductRepository } from "src/api/product-service/product/product.repository";
+import { ProductRepository } from "src/api/product-service/product/repository/product.repository";
 import { IFavoriteUtils, ValidateFavoriteOwnershipParams, validateProductAndFavoriteExistenceParams } from "./favorite.utils.interface";
 import { FavoriteDocument } from "../entities/types";
 import { FAVORITE_MESSAGE } from "../constants/favorite.message";

@@ -3,9 +3,8 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Cart, CartDocument } from "./schemas/cart.schema";
 import { ClientSession, Model, Types } from "mongoose";
 import { SharedUtilsService } from "src/common/utils/shared-utils.service";
-import { ProductRepository } from "src/api/product-service/product/product.repository";
-import { ProductDocument } from "src/api/product-service/product/schemas/product.schema";
-import { ProductStockDocument } from "src/api/product-service/product/schemas/product-stock.schema";
+import { ProductRepository } from "src/api/product-service/product/repository/product.repository";
+import { ProductDocument, ProductStockDocument } from "src/api/product-service/product/entities/types";
 
 export type PopulatedProduct = Pick<ProductDocument, '_id' | 'price' | 'discount'>
 export type PopulatedProductStock = Pick<ProductStockDocument, '_id' | 'additional_price' | 'is_limited' | 'auto_replenish' | 'replenish_quantity' | 'stock_quantity'>
@@ -30,7 +29,10 @@ export class CartRepository {
     async create(userInputs: Cart): Promise<void> {
         await this.sharedUtilsService.executeTransaction(async (session) => {
             await this.cartModel.create([userInputs], { session })
-            await this.productRepository.findOneAndUpdateStatistic({ carts: 1 }, userInputs.product, session)
+            await this.productRepository.findOneAndUpdateStatistic({
+                query: { carts: 1 },
+                productId: userInputs.product, session
+            })
         })
     }
 
@@ -41,7 +43,10 @@ export class CartRepository {
     async findByIdAndDelete(cart: Pick<CartDocument, '_id' | 'product' | 'user'>): Promise<void> {
         await this.sharedUtilsService.executeTransaction(async (session) => {
             await this.cartModel.findByIdAndDelete(cart._id, { session })
-            await this.productRepository.findOneAndUpdateStatistic({ carts: -1 }, cart.product, session)
+            await this.productRepository.findOneAndUpdateStatistic({
+                query: { carts: -1 },
+                productId: cart.product, session
+            })
         })
     }
 
@@ -68,7 +73,10 @@ export class CartRepository {
     async deleteMany(queryFields: Partial<Cart>, productIds: Types.ObjectId[]): Promise<void> {
         await this.sharedUtilsService.executeTransaction(async (session) => {
             await this.cartModel.deleteMany(queryFields, { session })
-            await this.productRepository.updateManyProductStatistic({ carts: -1 }, productIds, session)
+            await this.productRepository.updateManyProductStatistic({
+                query: { carts: -1 },
+                productIds, session
+            })
         })
     }
 

@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-import { ProductService } from './product.service';
+import { ProductService } from './service/product.service';
 import { ProductController } from './product.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Product, ProductSchema } from './schemas/product.schema';
-import { ProductDetail, ProductDetailSchema } from './schemas/product-details.schema';
-import { ProductStatistic, ProductStatisticSchema } from './schemas/product-statistic.schema';
-import { ProductStock, ProductStockSchema } from './schemas/product-stock.schema';
-import { ProductRepository } from './product.repository';
+import { Product, ProductSchema } from './entities/product.entity';
+import { ProductDetail, ProductDetailSchema } from './entities/product-details.entity';
+import { ProductStatistic, ProductStatisticSchema } from './entities/product-statistic.entity';
+import { ProductStock, ProductStockSchema } from './entities/product-stock.entity';
+import { ProductRepository } from './repository/product.repository';
 import { ProductUtilsService } from './utils/product-utils.service';
 import { UploadModule } from 'src/api/upload-service/upload/upload.module';
 import { SharedUtilsModule } from 'src/common/utils/shared-utils.module';

@@ -4,7 +4,7 @@ import { Request } from 'express';
 import { QuestionRepository } from './question.repository';
 import { SharedUtilsService } from 'src/common/utils/shared-utils.service';
 import { Types } from 'mongoose';
-import { ProductRepository } from 'src/api/product-service/product/product.repository';
+import { ProductRepository } from 'src/api/product-service/product/repository/product.repository';
 import { UpdateQuestionDto } from './dto/update-question.dto';
 import { CompanyRepository } from 'src/api/company-service/company/company.repository';
 import { GetQuestionDto } from './dto/get-question.dto';

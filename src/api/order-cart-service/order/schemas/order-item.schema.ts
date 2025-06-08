@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Types } from "mongoose";
-import { ProductStock } from "src/api/product-service/product/schemas/product-stock.schema";
-import { Product } from "src/api/product-service/product/schemas/product.schema";
+import { ProductStock } from "src/api/product-service/product/entities/product-stock.entity";
+import { Product } from "src/api/product-service/product/entities/product.entity";
 import { OrderStatus } from "src/common/types";
 import { Order } from "./order.schema";
 import { User } from "src/api/user-service/user/entities/user.entity";

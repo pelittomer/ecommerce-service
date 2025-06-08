@@ -1,24 +1,10 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, Types } from "mongoose";
-import { Product } from "./product.schema";
+import { Types } from "mongoose";
+import { Product } from "./product.entity";
 import { Variation } from "../../variation/entities/variation.entity";
 import { VariationOption } from "../../variation/entities/variation-option.entity";
 import { Upload } from "src/api/upload-service/upload/schemas/upload.schema";
-
-interface Feature {
-    name: string;
-    value: string;
-}
-interface Option {
-    option: Types.ObjectId;
-    images?: Types.ObjectId[];
-}
-interface Criteria {
-    variation: Types.ObjectId;
-    options: Option[];
-}
-
-export type ProductDetailDocument = ProductDetail & Document;
+import { Criteria, Feature } from "./types";
 
 @Schema({ timestamps: true })
 export class ProductDetail {
