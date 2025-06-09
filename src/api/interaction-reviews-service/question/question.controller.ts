@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post, Put, Query, Req, UseGuards, ValidationPipe } from '@nestjs/common';
-import { QuestionService } from './question.service';
+import { QuestionService } from './service/question.service';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
@@ -19,10 +19,10 @@ export class QuestionController {
   @Roles(Role.Customer)
   @Post()
   createQuestion(
-    @Body() userInputs: CreateQuestionDto,
+    @Body() payload: CreateQuestionDto,
     @Req() req: Request
   ) {
-    return this.questionService.createQuestion(userInputs, req)
+    return this.questionService.createQuestion({ payload, req })
   }
 
   @UseGuards(AuthGuard, RolesGuard)
@@ -30,15 +30,14 @@ export class QuestionController {
   @Put(':id')
   createAnswer(
     @Param('id', ParseObjectIdPipe) questionId: Types.ObjectId,
-    @Body() userInputs: UpdateQuestionDto,
+    @Body() payload: UpdateQuestionDto,
     @Req() req: Request
   ) {
-    return this.questionService.createAnswer(questionId, userInputs, req)
+    return this.questionService.createAnswer({ questionId, payload, req })
   }
 
   @Get()
   fetchQuestion(@Query(ValidationPipe) query: GetQuestionDto) {
     return this.questionService.findQuestions(query)
   }
-
 }
