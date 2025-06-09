@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { ReturnRequest } from "./schemas/return-request.schema";
+import { ReturnRequest } from "../entities/return-request.entity";
 import { Model } from "mongoose";
 
 @Injectable()
@@ -9,8 +9,7 @@ export class ReturnRequestRepository {
         @InjectModel(ReturnRequest.name) private returnRequestModel: Model<ReturnRequest>
     ) { }
 
-    async create(userInputs: Partial<ReturnRequest>): Promise<void> {
-        await this.returnRequestModel.create(userInputs)
+    async create(payload: Partial<ReturnRequest>): Promise<void> {
+        await this.returnRequestModel.create(payload)
     }
-
 }

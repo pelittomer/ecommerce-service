@@ -1,9 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, Types } from "mongoose";
+import { Types } from "mongoose";
 import { OrderItem } from "src/api/order-cart-service/order/schemas/order-item.schema";
-import { ReturnRequestStatus } from "src/common/types";
-
-export type ReturnRequestDocument = ReturnRequest & Document;
+import { ReturnRequestStatus } from "./types";
 
 @Schema({ timestamps: true })
 export class ReturnRequest {

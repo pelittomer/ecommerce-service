@@ -36,14 +36,6 @@ export enum PaymentStatus {
     PartiallyRefunded = "partially_refunded"
 }
 
-export enum ReturnRequestStatus {
-    ReturnRequested = "return_requested",
-    ReturnApproved = "return_approved",
-    ReturnRejected = "return_rejected",
-    Returned = "returned",
-    CancellationRequested = "cancellation_requested",
-}
-
 export enum OrderStatus {
     PaymentPending = "payment_pending",
     PaymentReceived = "payment_received",
