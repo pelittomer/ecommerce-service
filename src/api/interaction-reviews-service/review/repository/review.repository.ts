@@ -1,17 +1,15 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Review } from "./schemas/review.schema";
+import { Review } from "../entities/review.entity";
 import { Model, Types } from "mongoose";
 import { SharedUtilsService } from "src/common/utils/shared-utils.service";
 import { UploadService } from "src/api/upload-service/upload/upload.service";
 import { ProductRepository } from "src/api/product-service/product/repository/product.repository";
-import { CreateReviewDto } from "./dto/create-review.dto";
-import { GetReviewDto } from "./dto/get-review.dto";
-
-type MergedReviewDto = CreateReviewDto & Pick<Review, 'user' | 'is_purchased'>
+import { GetReviewDto } from "../dto/get-review.dto";
+import { CreateReviewOptions, IReviewRepository } from "./review.repository.interface";
 
 @Injectable()
-export class ReviewRepository {
+export class ReviewRepository implements IReviewRepository {
     constructor(
         @InjectModel(Review.name) private reviewModel: Model<Review>,
         private readonly sharedUtilsService: SharedUtilsService,
@@ -19,22 +17,23 @@ export class ReviewRepository {
         private readonly productRepository: ProductRepository,
     ) { }
 
-    async create(userInputs: MergedReviewDto, uploadedFiles: Express.Multer.File[]) {
+    async create(params: CreateReviewOptions): Promise<void> {
+        const { payload, uploadedFiles } = params
         await this.sharedUtilsService.executeTransaction(async (session) => {
             const images = await this.uploadService.createImage(uploadedFiles, session)
 
             await this.reviewModel.create([
-                { ...userInputs, images }
+                { ...payload, images }
             ], { session })
 
             await this.productRepository.findOneAndUpdateStatistic({
                 query: {
                     ratings: {
                         count: 1,
-                        average: userInputs.rate
+                        average: payload.rate
                     }
                 },
-                productId: userInputs.product, session
+                productId: payload.product, session
             })
         })
     }

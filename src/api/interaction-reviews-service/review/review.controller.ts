@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, Query, Req, UploadedFiles, UseGuards, ValidationPipe } from '@nestjs/common';
-import { ReviewService } from './review.service';
+import { ReviewService } from './service/review.service';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
@@ -18,11 +18,11 @@ export class ReviewController {
   @Post()
   @UploadReviewImage()
   createReview(
-    @Body() userInputs: CreateReviewDto,
+    @Body() payload: CreateReviewDto,
     @Req() req: Request,
-    @UploadedFiles() files: Express.Multer.File[]
+    @UploadedFiles() uploadedFiles: Express.Multer.File[]
   ) {
-    return this.reviewService.createReview(userInputs, req, files)
+    return this.reviewService.createReview({ payload, req, uploadedFiles })
   }
 
   @Get()
