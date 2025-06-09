@@ -1,7 +1,7 @@
 import { ApiProperty, PartialType } from "@nestjs/swagger";
 import { Transform } from "class-transformer";
 import { IsDate, IsEnum, IsOptional, IsString } from "class-validator";
-import { Gender } from "src/common/types";
+import { Gender } from "../entities/types";
 
 class UpdateProfileDto {
     @ApiProperty({ description: "User's first name", example: 'John' })
