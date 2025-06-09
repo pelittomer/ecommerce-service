@@ -1,5 +1,5 @@
 import { Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
-import { OrderService } from './order.service';
+import { OrderService } from './service/order.service';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/types';
 import { AuthGuard } from 'src/common/guards/auth.guard';
@@ -33,7 +33,7 @@ export class OrderController {
     @Param('id', ParseObjectIdPipe) orderId: Types.ObjectId,
     @Req() req: Request
   ) {
-    return this.orderService.findOrderDetails(orderId, req)
+    return this.orderService.findOrderDetails({ orderId, req })
   }
 
 }

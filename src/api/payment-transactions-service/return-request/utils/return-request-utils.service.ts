@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { OrderRepository } from "src/api/order-cart-service/order/order.repository";
+import { OrderRepository } from "src/api/order-cart-service/order/repository/order.repository";
 import { RETURN_REQUEST_MESSAGE } from "../constants/return-request.message";
 import { IReturnRequestUtilsService, ValidateOrderItemParams } from "./return-request-utils.service.interface";
 

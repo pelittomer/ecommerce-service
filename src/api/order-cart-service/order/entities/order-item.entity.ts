@@ -1,12 +1,10 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, Types } from "mongoose";
+import { Types } from "mongoose";
 import { ProductStock } from "src/api/product-service/product/entities/product-stock.entity";
 import { Product } from "src/api/product-service/product/entities/product.entity";
-import { OrderStatus } from "src/common/types";
-import { Order } from "./order.schema";
+import { Order } from "./order.entity";
 import { User } from "src/api/user-service/user/entities/user.entity";
-
-export type OrderItemDocument = OrderItem & Document;
+import { OrderStatus } from "./types";
 
 @Schema({ timestamps: true })
 export class OrderItem {

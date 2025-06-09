@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { OrderService } from './order.service';
+import { OrderService } from './service/order.service';
 import { OrderController } from './order.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Order, OrderSchema } from './schemas/order.schema';
-import { OrderItem, OrderItemSchema } from './schemas/order-item.schema';
-import { OrderRepository } from './order.repository';
+import { Order, OrderSchema } from './entities/order.entity';
+import { OrderItem, OrderItemSchema } from './entities/order-item.entity';
+import { OrderRepository } from './repository/order.repository';
 import { OrderUtilsService } from './utils/order-utils.service';
 import { CartModule } from '../cart/cart.module';
 import { AddressModule } from 'src/api/profile-service/address/address.module';

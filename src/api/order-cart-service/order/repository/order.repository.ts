@@ -1,17 +1,18 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Order, OrderDocument } from "./schemas/order.schema";
+import { Order } from "../entities/order.entity";
 import { Model, Types } from "mongoose";
-import { OrderItem, OrderItemDocument } from "./schemas/order-item.schema";
-import { OrderUtilsService } from "./utils/order-utils.service";
+import { OrderItem } from "../entities/order-item.entity";
+import { OrderUtilsService } from "../utils/order-utils.service";
 import { ProductRepository } from "src/api/product-service/product/repository/product.repository";
-import { CartRepository, PopulateCart } from "../cart/cart.repository";
+import { CartRepository } from "../../cart/cart.repository";
 import { SharedUtilsService } from "src/common/utils/shared-utils.service";
 import { PaymentRepository } from "src/api/payment-transactions-service/payment/repository/payment.repository";
-import { AddressDocument } from "src/api/profile-service/address/entities/types";
+import { OrderDocument } from "../entities/types";
+import { CreateOrderParams, FindOneOrderItemParams, FindOrderItemParams, IOrderRepository } from "./order.repository.interface";
 
 @Injectable()
-export class OrderRepository {
+export class OrderRepository implements IOrderRepository {
     constructor(
         @InjectModel(Order.name) private orderModel: Model<Order>,
         @InjectModel(OrderItem.name) private orderItemModel: Model<OrderItem>,
@@ -26,11 +27,8 @@ export class OrderRepository {
         return await this.orderItemModel.exists(queryFields)
     }
 
-    async create(
-        carts: PopulateCart[],
-        defaultAddress: Pick<AddressDocument, '_id'>,
-        totalAmount: number,
-        userId: Types.ObjectId): Promise<void> {
+    async create(params: CreateOrderParams): Promise<void> {
+        const { carts, defaultAddress, totalAmount, userId } = params
         this.sharedUtilsService.executeTransaction(async (session) => {
             // Create a new order
             const [newOrder] = await this.orderModel.create([{
@@ -124,12 +122,12 @@ export class OrderRepository {
         return this.orderModel.find(queryFields).sort({ createdAt: -1 }).lean()
     }
 
-    async findOrderItem(queryFields: Pick<OrderItem, 'user' | 'order'>): Promise<OrderItem[]> {
+    async findOrderItem(queryFields: FindOrderItemParams): Promise<OrderItem[]> {
         return await this.orderItemModel.find(queryFields)
             .sort({ price: -1 })
     }
 
-    async findOneOrderItem(queryFields: Pick<OrderItemDocument, '_id' | 'user'>): Promise<OrderItem | null> {
+    async findOneOrderItem(queryFields: FindOneOrderItemParams): Promise<OrderItem | null> {
         return await this.orderItemModel.findOne(queryFields).lean()
     }
 }

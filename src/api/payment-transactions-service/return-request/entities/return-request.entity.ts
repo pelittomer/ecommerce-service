@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Types } from "mongoose";
-import { OrderItem } from "src/api/order-cart-service/order/schemas/order-item.schema";
+import { OrderItem } from "src/api/order-cart-service/order/entities/order-item.entity";
 import { ReturnRequestStatus } from "./types";
 
 @Schema({ timestamps: true })

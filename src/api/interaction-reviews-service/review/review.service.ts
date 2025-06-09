@@ -5,7 +5,7 @@ import { ReviewRepository } from './review.repository';
 import { SharedUtilsService } from 'src/common/utils/shared-utils.service';
 import { ProductRepository } from 'src/api/product-service/product/repository/product.repository';
 import { Types } from 'mongoose';
-import { OrderRepository } from 'src/api/order-cart-service/order/order.repository';
+import { OrderRepository } from 'src/api/order-cart-service/order/repository/order.repository';
 import { GetReviewDto } from './dto/get-review.dto';
 import { Review } from './schemas/review.schema';
 

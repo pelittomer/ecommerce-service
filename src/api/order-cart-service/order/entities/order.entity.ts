@@ -1,12 +1,9 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, Types } from "mongoose";
+import { Prop, SchemaFactory } from "@nestjs/mongoose";
+import { Types } from "mongoose";
 import { Address } from "src/api/profile-service/address/entities/address.entity";
 import { User } from "src/api/user-service/user/entities/user.entity";
-import { OrderStatus } from "src/common/types";
+import { OrderStatus } from "./types";
 
-export type OrderDocument = Order & Document;
-
-@Schema({ timestamps: true })
 export class Order {
     @Prop({ type: Number, required: true })
     total_amount: number;
