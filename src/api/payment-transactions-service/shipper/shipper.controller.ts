@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, UploadedFile, UseGuards } from '@nestjs/common';
-import { ShipperService } from './shipper.service';
+import { ShipperService } from './service/shipper.service';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/types';
 import { AuthGuard } from 'src/common/guards/auth.guard';
@@ -16,10 +16,10 @@ export class ShipperController {
   @Post()
   @UploadImage()
   createShipper(
-    @Body() userInputs: CreateShipperDto,
+    @Body() payload: CreateShipperDto,
     @UploadedFile() uploadedImage: Express.Multer.File
   ) {
-    return this.shipperService.createShipper(userInputs, uploadedImage)
+    return this.shipperService.createShipper({ payload, uploadedImage })
   }
 
   @UseGuards(AuthGuard, RolesGuard)
