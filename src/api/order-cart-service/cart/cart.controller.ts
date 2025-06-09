@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
-import { CartService } from './cart.service';
+import { CartService } from './service/cart.service';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/types';
 import { AuthGuard } from 'src/common/guards/auth.guard';
@@ -18,10 +18,10 @@ export class CartController {
   @Roles(Role.Customer)
   @Post()
   createCart(
-    @Body() userInputs: CreateCartDto,
+    @Body() payload: CreateCartDto,
     @Req() req: Request
   ) {
-    return this.cartService.createCart(userInputs, req)
+    return this.cartService.createCart({ payload, req })
   }
 
   @UseGuards(AuthGuard, RolesGuard)
@@ -31,7 +31,7 @@ export class CartController {
     @Param('id', ParseObjectIdPipe) cartId: Types.ObjectId,
     @Req() req: Request
   ) {
-    return this.cartService.removeCart(cartId, req)
+    return this.cartService.removeCart({ cartId, req })
   }
 
   @UseGuards(AuthGuard, RolesGuard)
@@ -53,11 +53,9 @@ export class CartController {
   @Put(':id')
   updateCart(
     @Param('id', ParseObjectIdPipe) cartId: Types.ObjectId,
-    @Body() userInputs: UpdateCartDto,
+    @Body() payload: UpdateCartDto,
     @Req() req: Request
   ) {
-    return this.cartService.updateCart(cartId,userInputs,req)
+    return this.cartService.updateCart({ cartId, payload, req })
   }
-
-
 }

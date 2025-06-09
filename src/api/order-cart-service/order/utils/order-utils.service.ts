@@ -1,10 +1,11 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { CartRepository, PopulateCart } from "../../cart/cart.repository";
+import { CartRepository } from "../../cart/repository/cart.repository";
 import { ORDER_MESSAGE } from "../constants/order.message";
 import { Types } from "mongoose";
 import { AddressDocument } from "src/api/profile-service/address/entities/types";
 import { AddressRepository } from "src/api/profile-service/address/repository/address.repository";
 import { IOrderUtilsService } from "./order-utils.service.interface";
+import { PopulateCart } from "../../cart/repository/cart.repository.interface";
 
 @Injectable()
 export class OrderUtilsService implements IOrderUtilsService {

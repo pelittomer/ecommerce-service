@@ -1,9 +1,9 @@
 import { AddressDocument } from "src/api/profile-service/address/entities/types"
-import { PopulateCart } from "../../cart/cart.repository"
 import { Types } from "mongoose"
 import { Order } from "../entities/order.entity";
 import { OrderItem } from "../entities/order-item.entity";
 import { OrderDocument, OrderItemDocument } from "../entities/types";
+import { PopulateCart } from "../../cart/repository/cart.repository.interface";
 
 export interface CreateOrderParams {
     carts: PopulateCart[],

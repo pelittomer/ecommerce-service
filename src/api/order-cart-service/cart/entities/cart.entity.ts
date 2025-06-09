@@ -1,10 +1,8 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, Types } from "mongoose";
+import { Types } from "mongoose";
 import { ProductStock } from "src/api/product-service/product/entities/product-stock.entity";
 import { Product } from "src/api/product-service/product/entities/product.entity";
 import { User } from "src/api/user-service/user/entities/user.entity";
-
-export type CartDocument = Cart & Document;
 
 @Schema({ timestamps: true })
 export class Cart {

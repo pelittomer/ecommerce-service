@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
-import { PopulateCart } from "../../cart/cart.repository";
 import { AddressDocument } from "src/api/profile-service/address/entities/types";
+import { PopulateCart } from "../../cart/repository/cart.repository.interface";
 
 export interface IOrderUtilsService {
     calculateTotalAmount(carts: PopulateCart[]): number;

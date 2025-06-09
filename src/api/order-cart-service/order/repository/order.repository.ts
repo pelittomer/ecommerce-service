@@ -5,7 +5,7 @@ import { Model, Types } from "mongoose";
 import { OrderItem } from "../entities/order-item.entity";
 import { OrderUtilsService } from "../utils/order-utils.service";
 import { ProductRepository } from "src/api/product-service/product/repository/product.repository";
-import { CartRepository } from "../../cart/cart.repository";
+import { CartRepository } from "../../cart/repository/cart.repository";
 import { SharedUtilsService } from "src/common/utils/shared-utils.service";
 import { PaymentRepository } from "src/api/payment-transactions-service/payment/repository/payment.repository";
 import { OrderDocument } from "../entities/types";
@@ -110,11 +110,11 @@ export class OrderRepository implements IOrderRepository {
                 }))
 
             if (cartUpdates.length > 0) {
-                await this.cartRepository.updateBulkWrite(cartUpdates, session)
+                await this.cartRepository.updateBulkWrite({ queryFields: cartUpdates, session })
             }
 
             // Delete cart items after order creation
-            await this.cartRepository.deletePurchasableProducts({ user: userId, is_purchasable: true }, session)
+            await this.cartRepository.deletePurchasableProducts({ queryFieds: { user: userId, is_purchasable: true }, session })
         })
     }
 
