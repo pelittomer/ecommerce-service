@@ -1,17 +1,17 @@
 import { Injectable } from "@nestjs/common";
-import { Types } from "mongoose";
-import { CategoryDocument } from "../schemas/category.schema";
+import { BuildCategoryTreeParams, FindPathToRootParams, ICategoryUtilsService } from "./category-utils.service.interface";
 
 @Injectable()
-export class CategoryUtilsService {
+export class CategoryUtilsService implements ICategoryUtilsService {
 
-    private findPathToRoot(currentNode: any, categoryMap: Map<string, any>): any[] {
+    private findPathToRoot(params: FindPathToRootParams): any[] {
+        const { categoryMap, currentNode } = params
         const path: any[] = []
-
-        while (currentNode) {
-            path.unshift(currentNode)
-            if (currentNode.parent) {
-                currentNode = categoryMap.get(currentNode.parent.toString())
+        let current = currentNode
+        while (current) {
+            path.unshift(current)
+            if (current.parent) {
+                current = categoryMap.get(current.parent.toString())
             } else {
                 break
             }
@@ -19,7 +19,8 @@ export class CategoryUtilsService {
         return [path[0]]
     }
 
-    buildCategoryTree(categoryId: Types.ObjectId, categories: CategoryDocument[]): any[] {
+    buildCategoryTree(params: BuildCategoryTreeParams): any[] {
+        const { categories, categoryId } = params
         const categoryMap = new Map<string, any>()
         const rootNodes: any[] = []
 
@@ -44,7 +45,7 @@ export class CategoryUtilsService {
         // Find the starting node and return the tree
         const startingNode = categoryMap.get(categoryId.toString())
         if (startingNode) {
-            return this.findPathToRoot(startingNode, categoryMap)
+            return this.findPathToRoot({ currentNode: startingNode, categoryMap })
         }
 
         return rootNodes

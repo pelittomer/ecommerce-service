@@ -1,14 +1,14 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Category } from "./schemas/category.schema";
-import { ClientSession, Model, Types } from "mongoose";
-import { CreateCategoryDto } from "./dto/create-category.dto";
+import { Category } from "../schemas/category.schema";
+import { Model, Types } from "mongoose";
 import { SharedUtilsService } from "src/common/utils/shared-utils.service";
 import { UploadService } from "src/api/upload-service/upload/upload.service";
-import { CategoryUtilsService } from "./utils/category-utils.service";
+import { CategoryUtilsService } from "../utils/category-utils.service";
+import { CreateCategoryOptions, CreateRootCategoryOptions, CreateSubCategoryOptions, ICategoryRepository } from "./category.repository.interface";
 
 Injectable()
-export class CategoryRepository {
+export class CategoryRepository implements ICategoryRepository {
     constructor(
         @InjectModel(Category.name) private categoryModel: Model<Category>,
         private readonly sharedUtilsService: SharedUtilsService,
@@ -16,12 +16,13 @@ export class CategoryRepository {
         private readonly uploadService: UploadService,
     ) { }
 
-    async createRootCategory(userInputs: Partial<Category>, session: ClientSession) {
+    async createRootCategory(params: CreateRootCategoryOptions): Promise<void> {
+        const { payload, session } = params
         // Find the last category based on the right value.
         const lastCategory = await this.categoryModel.findOne().sort({ right: -1 }).session(session)
         // Determine the left and right values for the new root category.
         const newCategory = {
-            ...userInputs,
+            ...payload,
             left: lastCategory ? lastCategory.right + 1 : 1,
             right: lastCategory ? lastCategory.right + 2 : 2,
             parent: null,
@@ -30,7 +31,8 @@ export class CategoryRepository {
         await this.categoryModel.create([newCategory], { session })
     }
 
-    async createSubCategory(userInputs: Partial<Category>, parentId: Types.ObjectId, session: ClientSession) {
+    async createSubCategory(params: CreateSubCategoryOptions): Promise<void> {
+        const { parentId, payload, session } = params
         // Find the parent category by ID.
         const parentCategory = await this.categoryModel.findById(parentId).session(session)
         if (!parentCategory) throw new BadRequestException('Such a category could not be found.')
@@ -43,7 +45,7 @@ export class CategoryRepository {
             // Update the left values of categories with left values greater than the parent's right value.
             { updateMany: { filter: { left: { $gt: parentRight } }, update: { $inc: { left: 2 } } } },
             // Create the new subcategory with the appropriate left and right values.
-            { insertOne: { document: { ...userInputs, left: parentRight, right: parentRight + 1, parent: parentId } } },
+            { insertOne: { document: { ...payload, left: parentRight, right: parentRight + 1, parent: parentId } } },
         ]
 
         try {
@@ -53,17 +55,18 @@ export class CategoryRepository {
         }
     }
 
-    async create(userInputs: CreateCategoryDto, uploadedImage: { image: Express.Multer.File[], icon: Express.Multer.File[] }) {
+    async create(params: CreateCategoryOptions): Promise<void> {
+        const { payload, uploadedImage } = params
         await this.sharedUtilsService.executeTransaction(async (session) => {
             const [savedImage, savedIcon] = await Promise.all([
                 this.uploadService.createImage(uploadedImage.image[0], session),
                 this.uploadService.createImage(uploadedImage.icon[0], session)
             ])
 
-            const categoryData = { ...userInputs, icon: savedIcon as Types.ObjectId, image: savedImage as Types.ObjectId }
-            userInputs.parent
-                ? await this.createSubCategory(categoryData, userInputs.parent, session)
-                : await this.createRootCategory(categoryData, session)
+            const categoryData = { ...payload, icon: savedIcon as Types.ObjectId, image: savedImage as Types.ObjectId }
+            payload.parent
+                ? await this.createSubCategory({ payload: categoryData, parentId: payload.parent, session })
+                : await this.createRootCategory({ payload: categoryData, session })
         })
     }
 
@@ -96,6 +99,6 @@ export class CategoryRepository {
             left: { $gte: rootCategory.left },
         }).sort({ view_count: - 1 })
 
-        return this.categoryUtilsService.buildCategoryTree(categoryId, categories)
+        return this.categoryUtilsService.buildCategoryTree({ categoryId, categories })
     }
 }
