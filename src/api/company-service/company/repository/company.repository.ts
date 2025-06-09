@@ -1,11 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Company, CompanyDocument } from "./schemas/company.schema";
+import { Company } from "../entities/company.entity";
 import { Model, Types } from "mongoose";
 import { UploadService } from "src/api/upload-service/upload/upload.service";
 import { SharedUtilsService } from "src/common/utils/shared-utils.service";
-import { CreateCompanyDto } from "./dto/create-company.dto";
-import { UpdateCompanyStatusDto } from "./dto/update-company-status.dto";
+import { CompanyDocument } from "../entities/types";
+import { CreateCompanyOptions, FindByIdAndUpdateCompanyOptions, FindCompanyByIdAndUpdateStatusOptions, TFindCompanyByIdForCustomer } from "./company.repository.interface";
 
 @Injectable()
 export class CompanyRepository {
@@ -15,7 +15,6 @@ export class CompanyRepository {
         private readonly sharedUtilsService: SharedUtilsService,
     ) { }
 
-
     async findByOrQuery(queryFieds: Partial<Record<keyof Company, any>>): Promise<Company | null> {
         const orConditions = Object.keys(queryFieds).map(key => ({
             [key]: queryFieds[key]
@@ -23,13 +22,13 @@ export class CompanyRepository {
         return await this.companyModel.findOne({ $or: orConditions }).lean()
     }
 
-
-    async create(userId: Types.ObjectId, userInputs: CreateCompanyDto, uploadedImage: Express.Multer.File): Promise<void> {
+    async create(params: CreateCompanyOptions): Promise<void> {
+        const { payload, uploadedImage, userId } = params
         await this.sharedUtilsService.executeTransaction(async (session) => {
             const savedImage = await this.uploadService.createImage(uploadedImage, session)
             await this.companyModel.create([
                 {
-                    ...userInputs,
+                    ...payload,
                     user: userId,
                     logo: savedImage
                 }
@@ -41,25 +40,24 @@ export class CompanyRepository {
         return await this.companyModel.findOne(queryFieds)
     }
 
-    async findByIdAndUpdate(company: CompanyDocument, userInputs: Partial<Company>, uploadedImage: Express.Multer.File): Promise<void> {
+    async findByIdAndUpdate(params: FindByIdAndUpdateCompanyOptions): Promise<void> {
+        const { company, payload, uploadedImage } = params
         if (uploadedImage && company && company.logo) {
             await this.uploadService.updateExistingImage(uploadedImage, company.logo)
         }
-        await this.companyModel.findByIdAndUpdate(
-            company._id,
-            userInputs,
-        )
+        await this.companyModel.findByIdAndUpdate(company._id, payload)
     }
 
     async findById(companyId: Types.ObjectId): Promise<Company | null> {
         return await this.companyModel.findById(companyId).lean()
     }
 
-    async findCompanyByIdAndUpdateStatus(companyId: Types.ObjectId, userInputs: UpdateCompanyStatusDto): Promise<void> {
-        await this.companyModel.findByIdAndUpdate(companyId, userInputs)
+    async findCompanyByIdAndUpdateStatus(params: FindCompanyByIdAndUpdateStatusOptions): Promise<void> {
+        const { companyId, payload } = params
+        await this.companyModel.findByIdAndUpdate(companyId, payload)
     }
 
-    async findCompanyByIdForCustomer(companyId: Types.ObjectId): Promise<Exclude<Company, 'tax_id' | 'tax_office' | 'rejection_reason'> | null> {
+    async findCompanyByIdForCustomer(companyId: Types.ObjectId): Promise<TFindCompanyByIdForCustomer> {
         return await this.companyModel.findById(companyId).select('-tax_id -tax_office -rejection_reason').lean()
     }
 }

@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Transform } from "class-transformer";
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { CompanyStatus } from "src/common/types";
+import { CompanyStatus } from "../entities/types";
 
 export class UpdateCompanyStatusDto {
     @ApiProperty({ description: 'The current status of the company', example: CompanyStatus.Approved })

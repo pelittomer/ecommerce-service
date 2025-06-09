@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post, Put, Req, UploadedFile, UseGuards } from '@nestjs/common';
-import { CompanyService } from './company.service';
+import { CompanyService } from './service/company.service';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/types';
 import { AuthGuard } from 'src/common/guards/auth.guard';
@@ -21,11 +21,11 @@ export class CompanyController {
   @Post()
   @UploadImage()
   createCompany(
-    @Body() userInputs: CreateCompanyDto,
+    @Body() payload: CreateCompanyDto,
     @Req() req: Request,
     @UploadedFile() uploadedImage: Express.Multer.File
   ) {
-    return this.companyService.createCompany(userInputs, req, uploadedImage)
+    return this.companyService.createCompany({ payload, req, uploadedImage })
   }
 
   @UseGuards(AuthGuard, RolesGuard)
@@ -33,11 +33,11 @@ export class CompanyController {
   @Put()
   @UploadImage()
   updateCompany(
-    @Body() userInputs: UpdateCompanyDto,
+    @Body() payload: UpdateCompanyDto,
     @Req() req: Request,
     @UploadedFile() uploadedImage: Express.Multer.File
   ) {
-    return this.companyService.updateCompany(userInputs, req, uploadedImage)
+    return this.companyService.updateCompany({ payload, req, uploadedImage })
   }
 
   @UseGuards(AuthGuard, RolesGuard)
@@ -51,10 +51,10 @@ export class CompanyController {
   @Roles(Role.Admin)
   @Put(':id')
   updateCompanyStatus(
-    @Body() userInputs: UpdateCompanyStatusDto,
+    @Body() payload: UpdateCompanyStatusDto,
     @Param('id', ParseObjectIdPipe) companyId: Types.ObjectId
   ) {
-    return this.companyService.updateCompanyStatus(userInputs, companyId)
+    return this.companyService.updateCompanyStatus({ payload, companyId })
   }
 
   @Get(':id')

@@ -4,10 +4,10 @@ import { QUESTION_MESSAGE } from "../constants/question.message";
 import { ProductRepository } from "src/api/product-service/product/repository/product.repository";
 import { Types } from "mongoose";
 import { ProductDocument } from "src/api/product-service/product/entities/types";
-import { CompanyRepository } from "src/api/company-service/company/company.repository";
+import { CompanyRepository } from "src/api/company-service/company/repository/company.repository";
 import { QuestionDocument } from "../entities/types";
 import { QuestionRepository } from "../repository/question.repository";
-import { CompanyDocument } from "src/api/company-service/company/schemas/company.schema";
+import { CompanyDocument } from "src/api/company-service/company/entities/types";
 
 @Injectable()
 export class QuestionUtilsService implements IQuestionUtilsService {

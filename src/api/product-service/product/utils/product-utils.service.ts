@@ -1,12 +1,11 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { Types } from "mongoose";
-import { CompanyRepository } from "src/api/company-service/company/company.repository";
+import { CompanyRepository } from "src/api/company-service/company/repository/company.repository";
 import { UploadService } from "src/api/upload-service/upload/upload.service";
-import { CompanyStatus } from "src/common/types";
 import { UpdateProductDto } from "../dto/update-product.dto";
 import { GetDeleteImageIdsParams, IProductUtilsService, ProcessCriteriaImagesParams, SaveUploadedImagesParams, ValidateAndGroupUploadedFilesParams } from "./product-utils.service.interface";
-import { CompanyDocument } from "src/api/company-service/company/schemas/company.schema";
 import { PRODUCT_MESSAGE } from "../constants/product.message";
+import { CompanyDocument, CompanyStatus } from "src/api/company-service/company/entities/types";
 
 @Injectable()
 export class ProductUtilsService implements IProductUtilsService {

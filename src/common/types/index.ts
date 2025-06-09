@@ -19,8 +19,3 @@ export enum Gender {
     PreferNotToSay = "PreferNotToSay"
 }
 
-export enum CompanyStatus {
-    Pending = "PENDING",
-    Approved = "APPROVED",
-    Rejected = "REJECTED"
-}

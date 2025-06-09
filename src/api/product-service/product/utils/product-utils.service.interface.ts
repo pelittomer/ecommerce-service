@@ -1,8 +1,8 @@
 import { ClientSession, Types } from "mongoose";
-import { CompanyDocument } from "src/api/company-service/company/schemas/company.schema";
 import { UpdateProductDto } from "../dto/update-product.dto";
 import { CreateProductDto } from "../dto/create-product.dto";
 import { ProductDetailDocument, ProductDocument } from "../entities/types";
+import { CompanyDocument } from "src/api/company-service/company/entities/types";
 
 export interface ValidateAndGroupUploadedFilesParams {
     files: Express.Multer.File[];

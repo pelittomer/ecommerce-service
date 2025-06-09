@@ -1,10 +1,8 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, Types } from "mongoose";
+import { Types } from "mongoose";
 import { Upload } from "src/api/upload-service/upload/schemas/upload.schema";
 import { User } from "src/api/user-service/user/entities/user.entity";
-import { CompanyStatus } from "src/common/types";
-
-export type CompanyDocument = Company & Document;
+import { CompanyStatus } from "./types";
 
 @Schema({ timestamps: true })
 export class Company {
@@ -30,16 +28,16 @@ export class Company {
     address: string;
 
     @Prop({ type: String, required: true, unique: true })
-    tax_id: string; // Vergi numarası
+    tax_id: string;
 
     @Prop({ type: String, required: true })
-    tax_office: string; // Vergi dairesi
+    tax_office: string;
 
     @Prop({ type: String, enum: CompanyStatus, default: CompanyStatus.Pending })
-    status: string; // Başvuru durumu (beklemede, onaylandı, reddedildi)
+    status: string; 
 
     @Prop({ type: String })
-    rejection_reason: string; // Reddetme nedeni (isteğe bağlı)
+    rejection_reason: string; 
 
     @Prop({ type: Types.ObjectId, ref: User.name, required: true, unique: true })
     user: Types.ObjectId;
