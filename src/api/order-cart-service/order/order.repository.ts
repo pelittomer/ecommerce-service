@@ -7,7 +7,7 @@ import { OrderUtilsService } from "./utils/order-utils.service";
 import { ProductRepository } from "src/api/product-service/product/repository/product.repository";
 import { CartRepository, PopulateCart } from "../cart/cart.repository";
 import { SharedUtilsService } from "src/common/utils/shared-utils.service";
-import { PaymentRepository } from "src/api/payment-transactions-service/payment/payment.repository";
+import { PaymentRepository } from "src/api/payment-transactions-service/payment/repository/payment.repository";
 import { AddressDocument } from "src/api/profile-service/address/entities/types";
 
 @Injectable()
@@ -54,10 +54,13 @@ export class OrderRepository {
 
             //create payment
             await this.paymentRepository.create({
-                user: userId,
-                order: newOrder._id,
-                amount: totalAmount
-            }, session)
+                payload: {
+                    user: userId,
+                    order: newOrder._id,
+                    amount: totalAmount
+                },
+                session
+            })
 
             //send to queue
             const productIds = carts.map((item) => item.product._id as Types.ObjectId)

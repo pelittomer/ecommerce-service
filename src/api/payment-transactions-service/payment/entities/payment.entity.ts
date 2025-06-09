@@ -1,35 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { Document, Types } from 'mongoose'
+import { Types } from 'mongoose'
 import { Order } from 'src/api/order-cart-service/order/schemas/order.schema';
 import { User } from 'src/api/user-service/user/entities/user.entity';
-import { PaymentMethod, PaymentStatus } from 'src/common/types';
-
-interface CardDetails {
-    card_number?: string;
-    card_holder_name?: string;
-    expiry_month?: number;
-    expiry_year?: number;
-}
-
-interface EftDetails {
-    sender_name?: string;
-    sender_bank?: string;
-    receiver_bank?: string;
-    transfer_date?: Date;
-}
-
-interface PaymentDetails {
-    card_details?: CardDetails;
-    eft_details?: EftDetails;
-}
-
-interface RefundDetails {
-    refund_amount?: number;
-    refund_date?: Date;
-    refund_reason?: string;
-}
-
-export type PaymentDocument = Payment & Document;
+import { PaymentDetails, PaymentMethod, PaymentStatus, RefundDetails } from './types';
 
 @Schema({ timestamps: true })
 export class Payment {

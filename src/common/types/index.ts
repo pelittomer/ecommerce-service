@@ -19,23 +19,6 @@ export enum Gender {
     PreferNotToSay = "PreferNotToSay"
 }
 
-export enum PaymentMethod {
-    CreditCard = "credit_card",
-    EFT = "eft",
-    PayPal = "paypal",
-    MobilePayment = "mobile_payment",
-    Other = "other"
-}
-
-export enum PaymentStatus {
-    Pending = "pending",
-    Processing = "processing",
-    Completed = "completed",
-    Failed = "failed",
-    Refunded = "refunded",
-    PartiallyRefunded = "partially_refunded"
-}
-
 export enum OrderStatus {
     PaymentPending = "payment_pending",
     PaymentReceived = "payment_received",

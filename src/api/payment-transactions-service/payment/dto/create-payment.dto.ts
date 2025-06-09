@@ -1,7 +1,7 @@
 import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
-import { PaymentMethod } from 'src/common/types';
 import { ApiProperty } from '@nestjs/swagger';
+import { PaymentMethod } from '../entities/types';
 
 class CardDetailsDto {
     @ApiProperty({ description: 'Credit card number', example: '****-****-****-1234' })

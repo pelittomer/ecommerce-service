@@ -1,5 +1,5 @@
 import { Body, Controller, Param, Put, Req, UseGuards } from '@nestjs/common';
-import { PaymentService } from './payment.service';
+import { PaymentService } from './service/payment.service';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
@@ -17,11 +17,11 @@ export class PaymentController {
   @Roles(Role.Customer)
   @Put(':id')
   updatePayment(
-    @Body() userInputs: CreatePaymentDto,
+    @Body() payload: CreatePaymentDto,
     @Param('id', ParseObjectIdPipe) paymentId: Types.ObjectId,
     @Req() req: Request
   ) {
-    return this.paymentService.updatePayment(userInputs, paymentId, req)
+    return this.paymentService.updatePayment({ payload, paymentId, req })
   }
 
 }
