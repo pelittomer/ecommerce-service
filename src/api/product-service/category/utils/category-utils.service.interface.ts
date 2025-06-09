@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { CategoryDocument } from "../schemas/types";
+import { CategoryDocument } from "../entities/types";
 
 export interface BuildCategoryTreeParams {
     categoryId: Types.ObjectId;

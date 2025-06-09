@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, UploadedFile, UseGuards } from '@nestjs/common';
-import { BrandService } from './brand.service';
+import { BrandService } from './service/brand.service';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
@@ -16,10 +16,10 @@ export class BrandController {
   @Post()
   @UploadImage()
   createBrand(
-    @Body() userInputs: CreateBrandDto,
+    @Body() payload: CreateBrandDto,
     @UploadedFile() uploadedImage: Express.Multer.File
   ) {
-    return this.brandService.createBrand(userInputs, uploadedImage)
+    return this.brandService.createBrand({ payload, uploadedImage })
   }
 
   @Get()

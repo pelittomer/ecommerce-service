@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { Category } from "../schemas/category.schema";
+import { Category } from "../entities/category.entity";
 import { CreateCategoryDto } from "../dto/create-category.dto";
 
 export interface CreateCategoryProps {

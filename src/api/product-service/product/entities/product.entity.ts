@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Types } from "mongoose";
 import { Upload } from "src/api/upload-service/upload/schemas/upload.schema";
-import { Brand } from "../../brand/schemas/brand.schema";
+import { Brand } from "../../brand/entities/brand.entity";
 import { Company } from "src/api/company-service/company/schemas/company.schema";
 import { Shipper } from "src/api/payment-transactions-service/shipper/schemas/shipper.schema";
-import { Category } from "../../category/schemas/category.schema";
+import { Category } from "../../category/entities/category.entity";
 import { Discount } from "./types";
 
 @Schema({ timestamps: true })
