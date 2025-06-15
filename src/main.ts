@@ -35,7 +35,10 @@ async function bootstrap() {
   //middleware
   app.use(cookieParser())
   app.use(helmet())
-  app.enableCors()
+  app.enableCors({
+    origin: ['http://localhost:5173'],
+    credentials: true,
+  })
   //swagger configuration
   setupSwagger(app)
 
