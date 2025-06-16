@@ -23,10 +23,9 @@ export class ShipperController {
   }
 
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(Role.Seller)
+  @Roles(Role.Seller, Role.Admin)
   @Get()
   fetchShipper() {
     return this.shipperService.findShippers()
   }
-
 }
