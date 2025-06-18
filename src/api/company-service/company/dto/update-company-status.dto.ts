@@ -13,7 +13,6 @@ export class UpdateCompanyStatusDto {
     @ApiProperty({ description: 'Reason for rejecting the status change', example: 'Missing required documents' })
     @IsString()
     @IsOptional()
-    @IsNotEmpty()
     @Transform(({ value }) => value.trim())
     rejection_reason: string;
 }
