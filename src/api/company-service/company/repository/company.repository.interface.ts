@@ -27,4 +27,5 @@ export interface ICompanyRepository {
     findById(companyId: Types.ObjectId): Promise<Company | null>;
     findCompanyByIdAndUpdateStatus(params: FindCompanyByIdAndUpdateStatusOptions): Promise<void>;
     findCompanyByIdForCustomer(companyId: Types.ObjectId): Promise<TFindCompanyByIdForCustomer>;
+    find(): Promise<Company[]>;
 }

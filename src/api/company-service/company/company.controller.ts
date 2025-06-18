@@ -62,4 +62,10 @@ export class CompanyController {
     return this.companyService.findCompany(companyId)
   }
 
+  @UseGuards(AuthGuard,RolesGuard)
+  @Roles(Role.Admin)
+  @Get('/get/all')
+  fetchAllCompany(){
+    return this.companyService.fetchAllCompany()
+  }
 }

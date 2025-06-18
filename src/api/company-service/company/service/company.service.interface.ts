@@ -26,5 +26,6 @@ export interface ICompanyService {
     updateCompany(params: UpdateCompanyParams): Promise<string>;
     getAuthenticatedCompany(req: Request): Promise<CompanyDocument | null>;
     updateCompanyStatus(params: UpdateCompanyStatusParams): Promise<string>;
-    findCompany(companyId: Types.ObjectId): Promise<TFindCompany>
+    findCompany(companyId: Types.ObjectId): Promise<TFindCompany>;
+    fetchAllCompany(): Promise<Company[]>;
 }

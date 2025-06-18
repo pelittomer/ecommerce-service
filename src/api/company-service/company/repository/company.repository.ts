@@ -4,7 +4,7 @@ import { Company } from "../entities/company.entity";
 import { Model, Types } from "mongoose";
 import { UploadService } from "src/api/upload-service/upload/upload.service";
 import { SharedUtilsService } from "src/common/utils/shared-utils.service";
-import { CompanyDocument } from "../entities/types";
+import { CompanyDocument, CompanyStatus } from "../entities/types";
 import { CreateCompanyOptions, FindByIdAndUpdateCompanyOptions, FindCompanyByIdAndUpdateStatusOptions, TFindCompanyByIdForCustomer } from "./company.repository.interface";
 
 @Injectable()
@@ -59,5 +59,9 @@ export class CompanyRepository {
 
     async findCompanyByIdForCustomer(companyId: Types.ObjectId): Promise<TFindCompanyByIdForCustomer> {
         return await this.companyModel.findById(companyId).select('-tax_id -tax_office -rejection_reason').lean()
+    }
+
+    async find(): Promise<Company[]> {
+        return await this.companyModel.find().sort({ createdAt: -1 })
     }
 }

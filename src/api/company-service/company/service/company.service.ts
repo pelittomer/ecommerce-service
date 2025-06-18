@@ -7,6 +7,7 @@ import { CompanyDocument } from '../entities/types';
 import { CompanyUtilsService } from '../utils/company-utils.service';
 import { COMPANY_MESSAGE } from '../constants/company.message';
 import { CreateCompanyParams, ICompanyService, TFindCompany, UpdateCompanyParams, UpdateCompanyStatusParams } from './company.service.interface';
+import { Company } from '../entities/company.entity';
 
 @Injectable()
 export class CompanyService implements ICompanyService {
@@ -58,5 +59,9 @@ export class CompanyService implements ICompanyService {
 
     async findCompany(companyId: Types.ObjectId): Promise<TFindCompany> {
         return this.companyRepository.findCompanyByIdForCustomer(companyId)
+    }
+
+    async fetchAllCompany(): Promise<Company[]> {
+        return this.companyRepository.find()
     }
 }
